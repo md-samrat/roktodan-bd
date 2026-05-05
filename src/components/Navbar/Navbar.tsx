@@ -10,6 +10,7 @@ export default function Navbar() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!search.trim()) return;
 
     router.push(`/donors?group=${search}`);
@@ -17,73 +18,92 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full bg-white shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <nav className="w-full bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
-        {/* 🔵 Logo */}
+        {/* 🔴 Logo */}
         <h1 className="text-2xl md:text-4xl font-bold text-[var(--color-primary)] whitespace-nowrap">
-          রক্তদান 
+          রক্তদান
         </h1>
 
-        {/* 📚 Menu (desktop only) */}
-        <div className="hidden md:flex items-center gap-8 text-[var(--color-text-main)] font-medium text-lg md:text-xl">
-          <Link href="/">Home</Link>
-          <Link href="/about">About</Link>
-          <Link href="/donors">Donors</Link>
+        {/* 📚 Menu (Desktop) */}
+        <div className="hidden md:flex items-center gap-8 text-[var(--color-text-main)] font-medium text-lg">
+          <Link
+            href="/"
+            className="hover:text-[var(--color-primary)] transition font-semibold"
+          >
+            হোম
+          </Link>
+
+          <Link
+            href="/about"
+            className="hover:text-[var(--color-primary)] transition font-semibold"
+          >
+            আমাদের সম্পর্কে
+          </Link>
+
+          <Link
+            href="/donors"
+            className="hover:text-[var(--color-primary)] transition font-semibold"
+          >
+            রক্তদাতা
+          </Link>
         </div>
 
-        {/* 🔍 Search (desktop only, centered feel) */}
+        {/* 🔍 Search (Desktop) */}
         <form
           onSubmit={handleSearch}
-          className="hidden md:flex items-center border rounded-lg overflow-hidden"
+          className="hidden md:flex items-center border border-gray-200 rounded-lg overflow-hidden"
         >
           <input
             type="text"
-            placeholder="Search Blood A+, B-,AB+"
+            placeholder="A+, B-, O+ লিখুন"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-3 py-2 outline-none text-sm w-40"
+            className="px-4 py-2 outline-none text-sm w-44"
           />
+
           <button
             type="submit"
-            className="bg-[var(--color-primary)] text-white px-3 py-2 text-md"
+            className="bg-[var(--color-primary)] text-white px-4 py-2 text-sm font-medium"
           >
-            Search
+            খুঁজুন
           </button>
         </form>
 
-        {/* 🔐 Actions (desktop only) */}
+        {/* 🔐 Actions (Desktop) */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/login">
-            <button className="px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-secondary)] hover:text-white transition">
-              Login
+            <button className="px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary)] hover:text-white transition">
+              লগইন
             </button>
           </Link>
 
           <Link href="/register">
             <button className="btn-primary">
-              Register
+              রেজিস্ট্রেশন
             </button>
           </Link>
         </div>
 
-        {/* 📱 Mobile Search (only mobile) */}
+        {/* 📱 Mobile Search */}
         <form
           onSubmit={handleSearch}
-          className="flex md:hidden items-center border rounded-lg overflow-hidden ml-3 w-full max-w-[160px]"
+          className="flex md:hidden items-center border border-gray-200 rounded-lg overflow-hidden ml-3 w-full max-w-[180px]"
         >
           <input
             type="text"
-            placeholder="Search Blood"
+            placeholder="রক্ত খুঁজুন"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-2 py-2 outline-none text-sm w-full"
+            className="px-3 py-2 outline-none text-sm w-full"
           />
+
           <button
             type="submit"
-            className="bg-[var(--color-primary)] text-white px-2 py-2 text-sm"
+            className="bg-[var(--color-primary)] text-white px-3 py-2 text-sm"
           >
-            Search
+            খুঁজুন
           </button>
         </form>
 

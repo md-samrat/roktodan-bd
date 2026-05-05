@@ -4,7 +4,7 @@ import { FaFacebookF, FaWhatsapp } from "react-icons/fa";
 export default function Footer() {
   return (
     <footer className="relative bg-[var(--color-primary)] text-white mt-16">
-      {/* 🔺 top zigzag (optional decorative feel) */}
+      {/* 🔺 Top Shape */}
       <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
         <svg
           viewBox="0 0 1200 120"
@@ -18,74 +18,98 @@ export default function Footer() {
         </svg>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pt-14 pb-10 grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="max-w-6xl mx-auto px-4 pt-16 pb-10 grid grid-cols-1 md:grid-cols-3 gap-10">
+        
         {/* 🩸 Left */}
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold">রক্তদান </h2>
+          <h2 className="text-2xl md:text-3xl font-bold">
+            রক্তদান
+          </h2>
 
-          <p className="mt-3 text-sm md:text-lg text-white/90 leading-relaxed">
-            রক্তদান is an automated blood service that connects blood donors
-            with patients instantly through web platform.
+          <p className="mt-4 text-sm md:text-lg text-white/90 leading-relaxed">
+            রক্তদান হলো হোমনা, কুমিল্লার মানুষের জন্য একটি অনলাইন রক্তসেবা
+            প্ল্যাটফর্ম, যেখানে জরুরি মুহূর্তে দ্রুত রক্তদাতা খুঁজে পাওয়া যায়।
           </p>
         </div>
 
         {/* 📚 Middle */}
         <div>
           <h3 className="text-lg md:text-xl font-semibold mb-4">
-            Important Links
+            গুরুত্বপূর্ণ লিংক
           </h3>
-          <ul className="space-y-2 text-sm md:text-lg text-white/90">
+
+          <ul className="space-y-3 text-sm md:text-lg text-white/90">
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/" className="hover:underline">
+                হোম
+              </Link>
             </li>
+
             <li>
-              <Link href="/about">About</Link>
+              <Link href="/about" className="hover:underline">
+                আমাদের সম্পর্কে
+              </Link>
             </li>
+
             <li>
-              <Link href="/donors">Search Donors</Link>
+              <Link href="/donors" className="hover:underline">
+                রক্তদাতা খুঁজুন
+              </Link>
             </li>
           </ul>
         </div>
 
-        {/* 📘 Right */}
+        {/* 📞 Right */}
         <div>
-          <h3 className="text-lg md:text-xl font-semibold mb-4">Contact</h3>
-          <ul className="space-y-2 text-sm md:text-lg text-white/90">
+          <h3 className="text-lg md:text-xl font-semibold mb-4">
+            যোগাযোগ
+          </h3>
+
+          <ul className="space-y-3 text-sm md:text-lg text-white/90">
             <li>
-              <a href="mailto:md.samrat.dev@gmail.com">
-                Email : md.samrat.dev@gmail.com
+              <a
+                href="mailto:md.samrat.dev@gmail.com"
+                className="hover:underline"
+              >
+                Email: md.samrat.dev@gmail.com
               </a>
             </li>
-            <li className="flex gap-4 mt-3">
+
+            <li className="flex gap-5 mt-4">
+              {/* Facebook */}
               <a
                 href="https://www.facebook.com/mohammad.samrat0/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:scale-110 transition"
+                className="hover:scale-110 transition"
               >
-                <FaFacebookF size={30}/>
+                <FaFacebookF size={28} />
               </a>
+
               {/* WhatsApp */}
               <a
                 href="https://wa.me/8801861790495"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-green-500 hover:scale-110 transition"
+                className="hover:scale-110 transition"
               >
-                <FaWhatsapp size={30}/>
+                <FaWhatsapp size={30} />
               </a>
             </li>
           </ul>
         </div>
       </div>
 
-      {/* 🔻 Bottom bar */}
-      <div className="bg-black/40 text-center py-4 text-sm md:text-lg text-white/80 px-6">
+      {/* 🔻 Bottom Bar */}
+      <div className="bg-black/30 text-center py-4 text-sm md:text-base text-white/80 px-6">
         <span>
-          Copyright © {new Date().getFullYear()} RoktoDan Made with by{" "}
-          <Link href={"https://www.facebook.com/mohammad.samrat0/"} className="text-yellow-400 font-bold">
+          © {new Date().getFullYear()} রক্তদান — ভালোবাসা দিয়ে তৈরি করেছেন{" "}
+          <Link
+            href="https://www.facebook.com/mohammad.samrat0/"
+            className="text-yellow-300 font-semibold hover:underline"
+          >
             Mohammad Samrat
-          </Link>{" "}
+          </Link>
         </span>
       </div>
     </footer>
