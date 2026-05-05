@@ -101,9 +101,9 @@ export default function Footer() {
       </div>
 
       {/* 🔻 Bottom Bar */}
-      <div className="bg-black/30 text-center py-4 text-sm md:text-base text-white/80 px-6">
-        <span>
-          © {new Date().getFullYear()} রক্তদান — ভালোবাসা দিয়ে তৈরি করেছেন{" "}
+      <div className="bg-black/30 text-center py-4 text-sm md:text-lg  text-white/80 px-6">
+        <span className=" ">
+          © {new Date().getFullYear()} রক্তদান — Made With By{" "}
           <Link
             href="https://www.facebook.com/mohammad.samrat0/"
             className="text-yellow-300 font-semibold hover:underline"
