@@ -22,7 +22,7 @@ export default function Navbar() {
 
         {/* 🔵 Logo */}
         <h1 className="text-2xl md:text-4xl font-bold text-[var(--color-primary)] whitespace-nowrap">
-          RoktoDan
+          রক্তদান 
         </h1>
 
         {/* 📚 Menu (desktop only) */}
