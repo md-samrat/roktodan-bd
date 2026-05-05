@@ -12,7 +12,6 @@ export default function Navbar() {
     e.preventDefault();
     if (!search.trim()) return;
 
-    // redirect to donors page with query
     router.push(`/donors?group=${search}`);
     setSearch("");
   };
@@ -21,53 +20,73 @@ export default function Navbar() {
     <nav className="w-full bg-white shadow-sm">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
-        {/* 🔴 Logo */}
-        <h1 className="text-xl font-bold text-[var(--color-primary)]">
+        {/* 🔵 Logo */}
+        <h1 className="text-2xl md:text-4xl font-bold text-[var(--color-primary)] whitespace-nowrap">
           RoktoDan
         </h1>
 
-        {/* 📚 Menu */}
-        <div className="hidden md:flex items-center gap-6 text-[var(--color-text-main)] font-medium">
+        {/* 📚 Menu (desktop only) */}
+        <div className="hidden md:flex items-center gap-8 text-[var(--color-text-main)] font-medium text-lg md:text-xl">
           <Link href="/">Home</Link>
           <Link href="/about">About</Link>
-          <Link href="/donors">See Donors</Link>
+          <Link href="/donors">Donors</Link>
         </div>
 
-        {/* 🔍 Search + Actions */}
-        <div className="flex items-center gap-3">
+        {/* 🔍 Search (desktop only, centered feel) */}
+        <form
+          onSubmit={handleSearch}
+          className="hidden md:flex items-center border rounded-lg overflow-hidden"
+        >
+          <input
+            type="text"
+            placeholder="Search Blood A+, B-,AB+"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-3 py-2 outline-none text-sm w-40"
+          />
+          <button
+            type="submit"
+            className="bg-[var(--color-primary)] text-white px-3 py-2 text-md"
+          >
+            Search
+          </button>
+        </form>
 
-          {/* 🔍 Search Box */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center border rounded-lg overflow-hidden">
-            <input
-              type="text"
-              placeholder="Search blood (A+, B-)"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="px-3 py-2 outline-none text-sm"
-            />
-            <button
-              type="submit"
-              className="bg-[var(--color-primary)] text-white px-3 py-2"
-            >
-              Search
-            </button>
-          </form>
-
-          {/* Login */}
+        {/* 🔐 Actions (desktop only) */}
+        <div className="hidden md:flex items-center gap-3">
           <Link href="/login">
             <button className="px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-secondary)] hover:text-white transition">
               Login
             </button>
           </Link>
 
-          {/* Register */}
           <Link href="/register">
             <button className="btn-primary">
               Register
             </button>
           </Link>
-
         </div>
+
+        {/* 📱 Mobile Search (only mobile) */}
+        <form
+          onSubmit={handleSearch}
+          className="flex md:hidden items-center border rounded-lg overflow-hidden ml-3 w-full max-w-[160px]"
+        >
+          <input
+            type="text"
+            placeholder="Search Blood"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-2 py-2 outline-none text-sm w-full"
+          />
+          <button
+            type="submit"
+            className="bg-[var(--color-primary)] text-white px-2 py-2 text-sm"
+          >
+            Search
+          </button>
+        </form>
+
       </div>
     </nav>
   );
