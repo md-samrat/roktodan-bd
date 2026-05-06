@@ -13,7 +13,7 @@ export default function Stats() {
         </h2>
 
         <p className="mt-4 text-[var(--color-text-soft)] max-w-2xl mx-auto leading-7">
-          হোমনা থানার বিভিন্ন গ্রামের মানুষকে এক প্ল্যাটফর্মে যুক্ত করে
+          কুমিল্লার বিভিন্ন উপজেলার মানুষকে এক প্ল্যাটফর্মে যুক্ত করে
           জরুরি মুহূর্তে দ্রুত রক্তদাতা খুঁজে পাওয়ার সহজ সমাধান।
         </p>
 
@@ -25,7 +25,7 @@ export default function Stats() {
             <div className="text-6xl">🧑‍🤝‍🧑</div>
 
             <p className="mt-5 text-4xl font-extrabold text-[var(--color-primary)]">
-              ১৩০০+
+              ৫০০০+
             </p>
 
             <p className="mt-2 text-lg font-medium text-[var(--color-text-main)]">
@@ -37,20 +37,20 @@ export default function Stats() {
             </p>
           </div>
 
-          {/* Villages */}
+          {/* Areas */}
           <div className="card flex flex-col items-center">
             <div className="text-6xl">📍</div>
 
             <p className="mt-5 text-4xl font-extrabold text-[var(--color-primary)]">
-              ৫০+
+              ১৭+
             </p>
 
             <p className="mt-2 text-lg font-medium text-[var(--color-text-main)]">
-              গ্রামের কভারেজ
+              উপজেলার কভারেজ
             </p>
 
             <p className="mt-2 text-sm text-[var(--color-text-soft)]">
-              হোমনা থানার বিভিন্ন এলাকা যুক্ত
+              কুমিল্লার বিভিন্ন এলাকা যুক্ত
             </p>
           </div>
 

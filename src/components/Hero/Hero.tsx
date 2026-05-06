@@ -10,7 +10,7 @@ export default function Hero() {
           {/* 🧠 Left Content */}
           <div>
             <span className="text-sm px-4 py-2 rounded-full bg-[var(--color-secondary)] text-white font-medium">
-               • হোমনা রক্তদান নেটওয়ার্ক
+               • কুমিল্লা রক্তদান নেটওয়ার্ক
             </span>
 
             <h1 className="mt-5 text-4xl md:text-5xl font-bold text-[var(--color-text-main)] leading-tight">
@@ -71,7 +71,7 @@ export default function Hero() {
               </h2>
 
               <p className="mt-3 text-[var(--color-text-soft)] leading-7">
-                হোমনা এলাকার প্রয়োজনীয় রক্তের গ্রুপ অনুযায়ী দ্রুত রক্তদাতা খুঁজে নিন।
+                কুমিল্লায় প্রয়োজনীয় রক্তের গ্রুপ অনুযায়ী দ্রুত রক্তদাতা খুঁজে নিন।
               </p>
 
               <Link href="/donors">

@@ -27,7 +27,7 @@ export default function Footer() {
           </h2>
 
           <p className="mt-4 text-sm md:text-lg text-white/90 leading-relaxed">
-            রক্তদান হলো হোমনা, কুমিল্লার মানুষের জন্য একটি অনলাইন রক্তসেবা
+            রক্তদান হলো কুমিল্লার মানুষের জন্য একটি অনলাইন রক্তসেবা
             প্ল্যাটফর্ম, যেখানে জরুরি মুহূর্তে দ্রুত রক্তদাতা খুঁজে পাওয়া যায়।
           </p>
         </div>
@@ -101,8 +101,8 @@ export default function Footer() {
       </div>
 
       {/* 🔻 Bottom Bar */}
-      <div className="bg-black/30 text-center py-4 text-sm md:text-lg  text-white/80 px-6">
-        <span className=" ">
+      <div className="bg-black/30 text-center py-4 text-sm md:text-lg text-white/80 px-6">
+        <span>
           © {new Date().getFullYear()} রক্তদান — Made With By{" "}
           <Link
             href="https://www.facebook.com/mohammad.samrat0/"

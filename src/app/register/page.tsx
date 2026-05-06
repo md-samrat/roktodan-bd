@@ -85,7 +85,7 @@ export default function RegisterPage() {
           </h1>
 
           <p className="mt-4 text-[var(--color-text-soft)] leading-8 max-w-2xl mx-auto">
-            হোমনা থানার মানুষের জন্য তৈরি রক্তদান প্ল্যাটফর্মে আপনার তথ্য যুক্ত
+            কুমিল্লার মানুষের জন্য তৈরি রক্তদান প্ল্যাটফর্মে আপনার তথ্য যুক্ত
             করুন এবং জরুরি মুহূর্তে অন্যের জীবন বাঁচাতে এগিয়ে আসুন।
           </p>
         </div>
@@ -158,7 +158,7 @@ export default function RegisterPage() {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              placeholder="আপনার গ্রাম লিখুন"
+              placeholder="আপনার এলাকা লিখুন"
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none"
               required
             />
@@ -206,7 +206,7 @@ export default function RegisterPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
             <h2 className="text-2xl font-bold text-green-600 mb-3">
-              সফল হয়েছে 
+              সফল হয়েছে
             </h2>
             <p className="text-gray-600">
               আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। আপনাকে হোম পেজে নেওয়া হচ্ছে...
