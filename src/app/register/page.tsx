@@ -5,25 +5,70 @@ import { useState } from "react";
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
+    phoneNumber: "",
     bloodGroup: "",
-    village: "",
+    address: "",
     lastDonationDate: "",
     password: "",
   });
 
+  const [showModal, setShowModal] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
+
+  const bdPhoneRegex = /^01[3-9]\d{8}$/;
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    // phone number validation (frontend)
+    if (name === "phoneNumber") {
+      if (!value) {
+        setPhoneError("");
+      } else if (!bdPhoneRegex.test(value)) {
+        setPhoneError("সঠিক বাংলাদেশি মোবাইল নাম্বার দিন (01XXXXXXXXX)");
+      } else {
+        setPhoneError("");
+      }
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+
+    // submit এর আগেও validation check
+    if (!bdPhoneRegex.test(formData.phoneNumber)) {
+      setPhoneError("সঠিক বাংলাদেশি মোবাইল নাম্বার দিন (01XXXXXXXXX)");
+      return;
+    }
+
+    console.table(formData);
+
+    const res = await fetch("http://localhost:3000/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...formData,
+        bloodDonationDate: formData.lastDonationDate,
+      }),
+    });
+
+    if (res.ok) {
+      setShowModal(true);
+
+      // ⏳ 2 second por redirect
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
   };
 
   return (
@@ -40,17 +85,13 @@ export default function RegisterPage() {
           </h1>
 
           <p className="mt-4 text-[var(--color-text-soft)] leading-8 max-w-2xl mx-auto">
-            হোমনা থানার মানুষের জন্য তৈরি রক্তদান প্ল্যাটফর্মে আপনার তথ্য যুক্ত করুন
-            এবং জরুরি মুহূর্তে অন্যের জীবন বাঁচাতে এগিয়ে আসুন।
+            হোমনা থানার মানুষের জন্য তৈরি রক্তদান প্ল্যাটফর্মে আপনার তথ্য যুক্ত
+            করুন এবং জরুরি মুহূর্তে অন্যের জীবন বাঁচাতে এগিয়ে আসুন।
           </p>
         </div>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="card space-y-6 p-8 md:p-10"
-        >
-          {/* Name */}
+        <form onSubmit={handleSubmit} className="card space-y-6 p-8 md:p-10">
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               পুরো নাম
@@ -66,23 +107,25 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Phone */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               মোবাইল নাম্বার
             </label>
             <input
               type="text"
-              name="phone"
-              value={formData.phone}
+              name="phoneNumber"
+              value={formData.phoneNumber}
               onChange={handleChange}
               placeholder="01XXXXXXXXX"
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none"
               required
             />
+
+            {phoneError && (
+              <p className="mt-2 text-sm text-red-500">{phoneError}</p>
+            )}
           </div>
 
-          {/* Blood Group */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               রক্তের গ্রুপ
@@ -106,15 +149,14 @@ export default function RegisterPage() {
             </select>
           </div>
 
-          {/* Village */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               গ্রাম / এলাকা
             </label>
             <input
               type="text"
-              name="village"
-              value={formData.village}
+              name="address"
+              value={formData.address}
               onChange={handleChange}
               placeholder="আপনার গ্রাম লিখুন"
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none"
@@ -122,7 +164,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Last Donation */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               সর্বশেষ রক্তদানের তারিখ (যদি থাকে)
@@ -136,7 +177,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               পাসওয়ার্ড
@@ -152,7 +192,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             className="w-full btn-primary py-3 text-lg font-medium"
@@ -161,6 +200,20 @@ export default function RegisterPage() {
           </button>
         </form>
       </div>
+
+      {/* Success Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
+            <h2 className="text-2xl font-bold text-green-600 mb-3">
+              সফল হয়েছে 
+            </h2>
+            <p className="text-gray-600">
+              আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। আপনাকে হোম পেজে নেওয়া হচ্ছে...
+            </p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

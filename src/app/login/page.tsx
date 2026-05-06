@@ -22,7 +22,7 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="w-full bg-[var(--color-bg)] py-20 min-h-screen flex items-center">
+    <section className="w-full py-20 min-h-screen flex items-center">
       <div className="max-w-2xl mx-auto px-4 w-full">
         {/* Heading */}
         <div className="text-center mb-12">

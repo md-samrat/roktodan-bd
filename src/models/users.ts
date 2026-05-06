@@ -6,8 +6,9 @@ const UserSchema = new Schema({
     required: true,
   },
   phoneNumber: {
-    type: Number,
+    type: String,
     required: true,
+    match: [/^01[3-9]\d{8}$/, "Invalid Bangladeshi phone number"],
   },
   bloodGroup: {
     type: String,
@@ -17,7 +18,7 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  bloodDonationDate: {
+  lastDonationDate: {
     type: Date,
   },
   password: {
@@ -26,6 +27,6 @@ const UserSchema = new Schema({
   },
 });
 
-const UserModel = mongoose.models.User || mongoose.model("User",UserSchema)
+const UserModel = mongoose.models.User || mongoose.model("User", UserSchema);
 
-export default UserModel
+export default UserModel;
