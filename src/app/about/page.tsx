@@ -11,7 +11,7 @@ export default function AboutPage() {
           </p>
 
           <h1 className="mt-3 text-3xl md:text-5xl font-bold text-[var(--color-text-main)]">
-            রক্তদান — হোমনা, কুমিল্লার রক্তসেবা প্ল্যাটফর্ম
+            রক্তদান — হোমনা রক্তসেবা প্ল্যাটফর্ম
           </h1>
 
           <p className="mt-5 max-w-3xl mx-auto text-[var(--color-text-soft)] leading-8 text-lg">

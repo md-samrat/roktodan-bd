@@ -10,7 +10,7 @@ export default function Hero() {
           {/* 🧠 Left Content */}
           <div>
             <span className="text-sm px-4 py-2 rounded-full bg-[var(--color-secondary)] text-white font-medium">
-              হোমনা • কুমিল্লা রক্তদান নেটওয়ার্ক
+               • হোমনা রক্তদান নেটওয়ার্ক
             </span>
 
             <h1 className="mt-5 text-4xl md:text-5xl font-bold text-[var(--color-text-main)] leading-tight">
