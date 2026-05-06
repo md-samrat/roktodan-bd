@@ -1,24 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     phoneNumber: "",
     bloodGroup: "",
     address: "",
+    gender: "",
     lastDonationDate: "",
     password: "",
   });
 
   const [showModal, setShowModal] = useState(false);
   const [phoneError, setPhoneError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const bdPhoneRegex = /^01[3-9]\d{8}$/;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -27,7 +31,7 @@ export default function RegisterPage() {
       [name]: value,
     });
 
-    // phone number validation (frontend)
+    // phone number validation
     if (name === "phoneNumber") {
       if (!value) {
         setPhoneError("");
@@ -42,32 +46,50 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // submit এর আগেও validation check
     if (!bdPhoneRegex.test(formData.phoneNumber)) {
       setPhoneError("সঠিক বাংলাদেশি মোবাইল নাম্বার দিন (01XXXXXXXXX)");
       return;
     }
 
-    console.table(formData);
+    setLoading(true);
 
-    const res = await fetch("http://localhost:3000/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...formData,
-        bloodDonationDate: formData.lastDonationDate,
-      }),
-    });
+    try {
+      const res = await fetch("http://localhost:3000/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          bloodDonationDate: formData.lastDonationDate,
+        }),
+      });
 
-    if (res.ok) {
-      setShowModal(true);
+      const data = await res.json();
 
-      // ⏳ 2 second por redirect
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
+      // register/page.tsx এর handleSubmit এ
+      if (res.ok) {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+
+          // 👇 এই লাইনটা যোগ করুন (navbar রিফ্রেশের জন্য)
+          window.dispatchEvent(new Event("authChange"));
+        }
+
+        setShowModal(true);
+
+        setTimeout(() => {
+          router.push("/profile");
+          // router.refresh() এর দরকার নেই!
+        }, 2000);
+      } else {
+        alert(data.message || "রেজিস্ট্রেশন failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("রেজিস্ট্রেশন করতে সমস্যা হয়েছে");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,6 +114,7 @@ export default function RegisterPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="card space-y-6 p-8 md:p-10">
+          {/* Name */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               পুরো নাম
@@ -107,6 +130,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Phone */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               মোবাইল নাম্বার
@@ -126,6 +150,7 @@ export default function RegisterPage() {
             )}
           </div>
 
+          {/* Blood Group */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               রক্তের গ্রুপ
@@ -149,6 +174,26 @@ export default function RegisterPage() {
             </select>
           </div>
 
+          {/* Gender */}
+          <div>
+            <label className="block mb-2 font-medium text-[var(--color-text-main)]">
+              লিঙ্গ
+            </label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none"
+              required
+            >
+              <option value="">লিঙ্গ নির্বাচন করুন</option>
+              <option value="Male">পুরুষ</option>
+              <option value="Female">মহিলা</option>
+              <option value="Other">অন্যান্য</option>
+            </select>
+          </div>
+
+          {/* Address */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               গ্রাম / এলাকা
@@ -164,6 +209,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Last Donation */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               সর্বশেষ রক্তদানের তারিখ (যদি থাকে)
@@ -177,6 +223,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Password */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               পাসওয়ার্ড
@@ -192,11 +239,13 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
-            className="w-full btn-primary py-3 text-lg font-medium"
+            disabled={loading}
+            className="w-full btn-primary py-3 text-lg font-medium disabled:opacity-50"
           >
-            রেজিস্ট্রেশন সম্পন্ন করুন
+            {loading ? "রেজিস্ট্রেশন হচ্ছে..." : "রেজিস্ট্রেশন সম্পন্ন করুন"}
           </button>
         </form>
       </div>
@@ -205,11 +254,24 @@ export default function RegisterPage() {
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
-            <h2 className="text-2xl font-bold text-green-600 mb-3">
-              সফল হয়েছে
-            </h2>
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-green-600 mb-3">স্বাগতম!</h2>
             <p className="text-gray-600">
-              আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। আপনাকে হোম পেজে নেওয়া হচ্ছে...
+              আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। প্রোফাইলে নিয়ে যাওয়া হচ্ছে...
             </p>
           </div>
         </div>
