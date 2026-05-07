@@ -21,20 +21,17 @@ function DonorsContent() {
   const [loading, setLoading] = useState(true);
   const [searchGroup, setSearchGroup] = useState("");
 
-  // URL থেকে group প্যারামিটার নেওয়া (ডিকোড সহ)
   useEffect(() => {
     const group = searchParams.get("group");
     console.log("🔍 URL থেকে পাওয়া গ্রুপ (এনকোডেড):", group);
     
     if (group) {
-      // URL ডিকোড করুন (AB+ এর জন্য + চিহ্ন ঠিক রাখবে)
       const decodedGroup = decodeURIComponent(group);
       console.log("🔍 ডিকোড করা গ্রুপ:", decodedGroup);
       setSearchGroup(decodedGroup);
     }
   }, [searchParams]);
 
-  // ডাটা লোড করা
   useEffect(() => {
     fetchDonors();
   }, []);
@@ -47,7 +44,6 @@ function DonorsContent() {
 
       console.log("📋 সব দাতা:", data);
       
-      // ডাটাবেসে কি কি গ্রুপ আছে দেখুন
       const groups = [...new Set(data.map((d: any) => d.bloodGroup))];
       console.log("📋 ডাটাবেসের গ্রুপসমূহ:", groups);
 
@@ -61,10 +57,8 @@ function DonorsContent() {
     }
   };
 
-  // ফিল্টার ফাংশন (এক্সাক্ট ম্যাচ)
   useEffect(() => {
     if (searchGroup) {
-      // স্ট্রেইট এক্সাক্ট ম্যাচ (Case-insensitive)
       const filtered = donors.filter(
         (donor) => donor.bloodGroup?.toLowerCase() === searchGroup.toLowerCase()
       );

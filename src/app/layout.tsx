@@ -11,8 +11,8 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "RoktoDan",
-  description: "Blood donation platform for Homna",
+  title: "রক্তদান",
+  description: "Blood donation platform for Cumilla",
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [search, setSearch] = useState("");
@@ -11,6 +11,7 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null);
 
   const router = useRouter();
+  const pathname = usePathname();
 
   // টোকেন লোড করার ফাংশন
   const loadToken = () => {
@@ -33,6 +34,7 @@ export default function Navbar() {
   useEffect(() => {
     loadToken();
 
+    // 👇 এই ইভেন্ট লিসেনারটা গুরুত্বপূর্ণ
     const handleStorageChange = () => {
       loadToken();
     };
@@ -46,20 +48,17 @@ export default function Navbar() {
     };
   }, []);
 
-  // 🔍 সার্চ হ্যান্ডলার - এটি কাজ করবে
- 
-// Navbar এর handleSearch ফাংশন আপডেট করুন
-// Navbar এর handleSearch (AB+ এর জন্য এনকোডিং যোগ করুন)
-const handleSearch = (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!search.trim()) return;
-  
-  // URL এনকোডিং (AB+ কে AB%2B করবে)
-  const searchTerm = encodeURIComponent(search.trim().toUpperCase());
-  console.log("🔍 সার্চ টার্ম:", searchTerm);
-  router.push(`/donors?group=${searchTerm}`);
-  setSearch("");
-};
+  const isActive = (path: string) => {
+    return pathname === path;
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!search.trim()) return;
+    const searchTerm = encodeURIComponent(search.trim().toUpperCase());
+    router.push(`/donors?group=${searchTerm}`);
+    setSearch("");
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -92,7 +91,6 @@ const handleSearch = (e: React.FormEvent) => {
             <button type="submit" className="bg-[var(--color-primary)] text-white px-2 text-sm">🔍</button>
           </form>
 
-          {/* প্রোফাইল আইকন (মোবাইলে) */}
           {token ? (
             <Link href="/profile">
               <img
@@ -103,23 +101,27 @@ const handleSearch = (e: React.FormEvent) => {
             </Link>
           ) : (
             <Link href="/login">
-              <button className="px-3 py-1.5 border rounded-lg text-sm">
-                লগইন
-              </button>
+              <button className="px-3 py-1.5 border rounded-lg text-sm">লগইন</button>
             </Link>
           )}
         </div>
 
-        {/* 💻 ডেস্কটপ ডিভাইস */}
+        {/* 💻 ডেস্কটপ */}
         <div className="hidden md:flex items-center justify-between w-full">
           <Link href="/" className="text-3xl font-bold text-[var(--color-primary)]">
             রক্তদান
           </Link>
 
           <div className="flex gap-8 font-medium">
-            <Link href="/" className="hover:text-[var(--color-primary)]">হোম</Link>
-            <Link href="/about" className="hover:text-[var(--color-primary)]">আমাদের সম্পর্কে</Link>
-            <Link href="/donors" className="hover:text-[var(--color-primary)]">রক্তদাতা</Link>
+            <Link href="/" className={`transition ${isActive("/") ? "text-[var(--color-primary)] border-b-2 border-[var(--color-primary)] pb-1" : "hover:text-[var(--color-primary)]"}`}>
+              হোম
+            </Link>
+            <Link href="/about" className={`transition ${isActive("/about") ? "text-[var(--color-primary)] border-b-2 border-[var(--color-primary)] pb-1" : "hover:text-[var(--color-primary)]"}`}>
+              আমাদের সম্পর্কে
+            </Link>
+            <Link href="/donors" className={`transition ${isActive("/donors") ? "text-[var(--color-primary)] border-b-2 border-[var(--color-primary)] pb-1" : "hover:text-[var(--color-primary)]"}`}>
+              রক্তদাতা
+            </Link>
           </div>
 
           <form onSubmit={handleSearch} className="flex border rounded-lg overflow-hidden">
@@ -129,9 +131,7 @@ const handleSearch = (e: React.FormEvent) => {
               className="px-4 py-2 w-44 outline-none"
               placeholder="যেমন: A+, B-, O+"
             />
-            <button type="submit" className="bg-[var(--color-primary)] text-white px-4">
-              খুঁজুন
-            </button>
+            <button type="submit" className="bg-[var(--color-primary)] text-white px-4">খুঁজুন</button>
           </form>
 
           <div className="flex items-center gap-3">
@@ -139,33 +139,19 @@ const handleSearch = (e: React.FormEvent) => {
               <>
                 <Link href="/profile">
                   <div className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1 rounded-lg">
-                    <img
-                      src={user?.profileImage || "/profile.png"}
-                      className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] object-cover"
-                    />
+                    <img src={user?.profileImage || "/profile.png"} className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] object-cover" />
                     <span className="text-sm font-medium">{user?.name || "প্রোফাইল"}</span>
                   </div>
                 </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-1.5 border rounded-lg text-red-500 hover:bg-red-50 transition"
-                >
-                  লগআউট
-                </button>
+                <button onClick={handleLogout} className="px-3 py-1.5 border rounded-lg text-red-500 hover:bg-red-50 transition">লগআউট</button>
               </>
             ) : (
               <>
                 <Link href="/register">
-                  <button className="btn-primary px-4 py-1.5">
-                    রেজিস্ট্রেশন
-                  </button>
+                  <button className="btn-primary px-4 py-1.5">রেজিস্ট্রেশন</button>
                 </Link>
-
                 <Link href="/login">
-                  <button className="px-4 py-1.5 border rounded-lg hover:bg-gray-50">
-                    লগইন
-                  </button>
+                  <button className="px-4 py-1.5 border rounded-lg hover:bg-gray-50">লগইন</button>
                 </Link>
               </>
             )}
@@ -173,18 +159,14 @@ const handleSearch = (e: React.FormEvent) => {
         </div>
       </div>
 
-      {/* 🍔 হ্যামবার্গার মেনু (সাইড ড্রয়ার) */}
+      {/* হ্যামবার্গার মেনু */}
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setOpen(false)}>
           <div className="bg-white w-72 h-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            {/* প্রোফাইল হেডার */}
             <div className="flex justify-between items-center mb-6 pb-4 border-b">
               {token ? (
                 <div className="flex items-center gap-3">
-                  <img
-                    src={user?.profileImage || "/profile.png"}
-                    className="w-12 h-12 rounded-full border-2 border-[var(--color-primary)] object-cover"
-                  />
+                  <img src={user?.profileImage || "/profile.png"} className="w-12 h-12 rounded-full border-2 border-[var(--color-primary)] object-cover" />
                   <div>
                     <p className="font-bold text-gray-800">{user?.name || "ইউজার"}</p>
                     <p className="text-xs text-gray-500">{user?.phoneNumber || ""}</p>
@@ -193,76 +175,23 @@ const handleSearch = (e: React.FormEvent) => {
               ) : (
                 <h2 className="text-xl font-bold text-[var(--color-primary)]">মেনু</h2>
               )}
-              <button onClick={() => setOpen(false)} className="text-2xl text-gray-500">
-                ✕
-              </button>
+              <button onClick={() => setOpen(false)} className="text-2xl text-gray-500">✕</button>
             </div>
             
-            {/* মেনু আইটেম */}
             <div className="flex flex-col gap-4">
-              <Link 
-                href="/" 
-                onClick={() => setOpen(false)} 
-                className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition"
-              >
-                <span>🏠</span> হোম
-              </Link>
-              
-              <Link 
-                href="/about" 
-                onClick={() => setOpen(false)} 
-                className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition"
-              >
-                <span>📖</span> আমাদের সম্পর্কে
-              </Link>
-              
-              <Link 
-                href="/donors" 
-                onClick={() => setOpen(false)} 
-                className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition"
-              >
-                <span>🩸</span> রক্তদাতা
-              </Link>
-              
+              <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🏠 হোম</Link>
+              <Link href="/about" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">📖 আমাদের সম্পর্কে</Link>
+              <Link href="/donors" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🩸 রক্তদাতা</Link>
               <hr className="my-2" />
-              
               {token ? (
                 <>
-                  <Link 
-                    href="/profile" 
-                    onClick={() => setOpen(false)} 
-                    className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition"
-                  >
-                    <span>👤</span> প্রোফাইল
-                  </Link>
-                  
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setOpen(false);
-                    }}
-                    className="flex items-center gap-3 px-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition mt-2"
-                  >
-                    <span>🚪</span> লগআউট
-                  </button>
+                  <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">👤 প্রোফাইল</Link>
+                  <button onClick={() => { handleLogout(); setOpen(false); }} className="flex items-center gap-3 px-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition">🚪 লগআউট</button>
                 </>
               ) : (
                 <>
-                  <Link 
-                    href="/register" 
-                    onClick={() => setOpen(false)} 
-                    className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition"
-                  >
-                    <span>📝</span> রেজিস্ট্রেশন
-                  </Link>
-                  
-                  <Link 
-                    href="/login" 
-                    onClick={() => setOpen(false)} 
-                    className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition"
-                  >
-                    <span>🔑</span> লগইন
-                  </Link>
+                  <Link href="/register" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">📝 রেজিস্ট্রেশন</Link>
+                  <Link href="/login" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🔑 লগইন</Link>
                 </>
               )}
             </div>

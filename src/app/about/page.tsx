@@ -1,4 +1,7 @@
+import DonationSection from "@/components/DonationSection/DonationSection";
 import Link from "next/link";
+
+
 
 export default function AboutPage() {
   return (
@@ -98,6 +101,8 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
+      <DonationSection></DonationSection>
     </section>
+    
   );
 }

@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     phoneNumber: "",
     password: "",
   });
 
   const [errorModal, setErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +28,8 @@ export default function LoginPage() {
     setErrorModal(false);
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      // ✅ সঠিক API endpoint (এটা চেক করুন)
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,17 +38,31 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+      console.log("Response status:", res.status);
+      console.log("Response data:", data);
 
       if (!res.ok) {
-        // ❗ show modal instead of simple error
+        if (res.status === 404) {
+          setErrorMessage("এই মোবাইল নাম্বারটি আমাদের সিস্টেমে পাওয়া যায়নি। আগে রেজিস্ট্রেশন করুন।");
+        } else if (res.status === 401) {
+          setErrorMessage("পাসওয়ার্ড ভুল। অনুগ্রহ করে সঠিক পাসওয়ার্ড দিন।");
+        } else {
+          setErrorMessage(data.message || "লগইন করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+        }
         setErrorModal(true);
         setLoading(false);
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      window.location.href = "/";
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        // Navbar আপডেটের জন্য ইভেন্ট ডিসপ্যাচ
+        window.dispatchEvent(new Event("authChange"));
+        router.push("/profile");
+      }
     } catch (err) {
+      console.error("Fetch error:", err);
+      setErrorMessage("নেটওয়ার্ক সমস্যা হয়েছে। আবার চেষ্টা করুন।");
       setErrorModal(true);
     } finally {
       setLoading(false);
@@ -102,35 +120,38 @@ export default function LoginPage() {
         </form>
       </div>
 
-      {/* 🚨 Error Modal */}
+      {/* Error Modal */}
       {errorModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 text-center w-[90%] max-w-md shadow-xl">
 
-            <div className="text-5xl mb-4">⚠️</div>
+            <div className="text-5xl mb-4">
+              {errorMessage.includes("পাসওয়ার্ড") ? "🔐" : "⚠️"}
+            </div>
 
             <h2 className="text-2xl font-bold text-red-600">
-              আপনি রেজিস্ট্রেশন করেননি
+              {errorMessage.includes("পাসওয়ার্ড") ? "পাসওয়ার্ড ভুল!" : "ইউজার পাওয়া যায়নি!"}
             </h2>
 
             <p className="text-gray-600 mt-3 leading-7">
-              এই মোবাইল নাম্বারটি আমাদের সিস্টেমে পাওয়া যায়নি।  
-              আগে রেজিস্ট্রেশন করুন তারপর লগইন করুন।
+              {errorMessage}
             </p>
 
             <div className="mt-6 flex gap-3 justify-center">
               <button
                 onClick={() => setErrorModal(false)}
-                className="px-4 py-2 border rounded-lg"
+                className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition"
               >
                 বন্ধ করুন
               </button>
 
-              <Link href="/register">
-                <button className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg">
-                  রেজিস্ট্রেশন করুন
-                </button>
-              </Link>
+              {errorMessage.includes("পাওয়া যায়নি") && (
+                <Link href="/register">
+                  <button className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition">
+                    রেজিস্ট্রেশন করুন
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

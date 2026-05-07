@@ -1,4 +1,55 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 export default function Stats() {
+  const [stats, setStats] = useState({
+    totalDonors: 0,
+    areas: 0,
+    bloodGroups: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/users");
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+          // ইউনিক ব্লাড গ্রুপ গণনা
+          const uniqueBloodGroups = new Set(data.map((user: any) => user.bloodGroup).filter(Boolean));
+          
+          // ইউনিক এলাকা গণনা
+          const uniqueAreas = new Set(
+            data.map((user: any) => {
+              const address = user.address || "";
+              const area = address.split(",")[0]?.trim();
+              return area;
+            }).filter(Boolean)
+          );
+          
+          setStats({
+            totalDonors: data.length,
+            areas: uniqueAreas.size || 17,
+            bloodGroups: uniqueBloodGroups.size || 8
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+        setStats({
+          totalDonors: 150,
+          areas: 17,
+          bloodGroups: 8
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <section className="w-full bg-white py-20">
       <div className="max-w-6xl mx-auto px-4 text-center">
@@ -9,7 +60,7 @@ export default function Stats() {
         </p>
 
         <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-text-main)] mt-3">
-          রোক্তদান একটি দ্রুত বর্ধনশীল রক্তদান নেটওয়ার্ক
+          রক্তদান একটি দ্রুত বর্ধনশীল রক্তদান নেটওয়ার্ক
         </h2>
 
         <p className="mt-4 text-[var(--color-text-soft)] max-w-2xl mx-auto leading-7">
@@ -25,7 +76,11 @@ export default function Stats() {
             <div className="text-6xl">🧑‍🤝‍🧑</div>
 
             <p className="mt-5 text-4xl font-extrabold text-[var(--color-primary)]">
-              ৫০০০+
+              {loading ? (
+                <span className="inline-block w-20 h-10 bg-gray-200 animate-pulse rounded"></span>
+              ) : (
+                `${stats.totalDonors.toLocaleString()}+`
+              )}
             </p>
 
             <p className="mt-2 text-lg font-medium text-[var(--color-text-main)]">
@@ -42,7 +97,11 @@ export default function Stats() {
             <div className="text-6xl">📍</div>
 
             <p className="mt-5 text-4xl font-extrabold text-[var(--color-primary)]">
-              ১৭+
+              {loading ? (
+                <span className="inline-block w-20 h-10 bg-gray-200 animate-pulse rounded"></span>
+              ) : (
+                `${stats.areas}+`
+              )}
             </p>
 
             <p className="mt-2 text-lg font-medium text-[var(--color-text-main)]">
@@ -59,7 +118,11 @@ export default function Stats() {
             <div className="text-6xl">🩸</div>
 
             <p className="mt-5 text-4xl font-extrabold text-[var(--color-primary)]">
-              ৮
+              {loading ? (
+                <span className="inline-block w-20 h-10 bg-gray-200 animate-pulse rounded"></span>
+              ) : (
+                stats.bloodGroups
+              )}
             </p>
 
             <p className="mt-2 text-lg font-medium text-[var(--color-text-main)]">

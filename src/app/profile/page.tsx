@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadImageToImgbb } from "@/lib/uploadImage";
-import { FaLocationDot, FaMobileRetro } from "react-icons/fa6";
-import { FaMobile } from "react-icons/fa";
+import { FaLocationDot, FaMobile } from "react-icons/fa6";
+import DonationSection from "@/components/DonationSection/DonationSection";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [userData, setUserData] = useState({
     id: "",
     name: "",
@@ -30,7 +31,6 @@ export default function ProfilePage() {
 
       if (!token) {
         router.push("/login");
-       
         return;
       }
 
@@ -87,7 +87,6 @@ export default function ProfilePage() {
         if (uploadedUrl) {
           imageUrl = uploadedUrl;
         } else {
-          // আপলোড fail হলে UI Avatar ব্যবহার করবে
           imageUrl = "";
         }
       }
@@ -120,6 +119,8 @@ export default function ProfilePage() {
       // নতুন টোকেন স্টোর করা
       if (result.token) {
         localStorage.setItem("token", result.token);
+        // Navbar আপডেটের জন্য
+        window.dispatchEvent(new Event("authChange"));
       }
 
       // লোকাল স্টেট আপডেট
@@ -131,7 +132,15 @@ export default function ProfilePage() {
 
       setEditOpen(false);
       setImageFile(null);
-      alert("Profile updated successfully!");
+      
+      // ✅ অ্যালার্টের পরিবর্তে মডাল দেখান
+      setShowSuccessModal(true);
+      
+      // 2 সেকেন্ড পর মডাল বন্ধ করুন
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 2000);
+      
     } catch (error: any) {
       console.error("Save error:", error);
       alert(error.message || "Something went wrong");
@@ -152,7 +161,6 @@ export default function ProfilePage() {
             alt="Profile"
             className="w-32 h-32 rounded-full border-4 border-[var(--color-primary)] object-cover"
             onError={(e) => {
-              // ইমেজ লোড না হলে UI Avatar দেখাবে
               (e.target as HTMLImageElement).src = getAvatarUrl();
             }}
           />
@@ -175,9 +183,7 @@ export default function ProfilePage() {
         {/* INFO */}
         <div className="mt-10 text-left space-y-4">
           <div className="flex justify-between border-b pb-2">
-            <span className="flex items-center gap-3"><FaMobile color="blue"/>
-
- Phone</span>
+            <span className="flex items-center gap-3"><FaMobile color="blue"/> Phone</span>
             <span>{userData.phoneNumber || "Not set"}</span>
           </div>
 
@@ -187,8 +193,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex justify-between border-b pb-2">
-            <span className="flex items-center gap-3"><FaLocationDot color="green"/>
- Address</span>
+            <span className="flex items-center gap-3"><FaLocationDot color="green"/> Address</span>
             <span>{userData.address || "Not set"}</span>
           </div>
 
@@ -197,15 +202,14 @@ export default function ProfilePage() {
             <span>{userData.gender || "Not set"}</span>
           </div>
         </div>
+        <DonationSection />
       </div>
-
+            
       {/* EDIT MODAL */}
       {editOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white w-full max-w-lg rounded-2xl p-6">
-            <h2 className="text-xl font-bold mb-5">
-              Edit Profile
-            </h2>
+            <h2 className="text-xl font-bold mb-5">Edit Profile</h2>
 
             {/* IMAGE UPLOAD */}
             <div className="flex flex-col items-center mb-6">
@@ -225,15 +229,11 @@ export default function ProfilePage() {
                   type="file"
                   hidden
                   accept="image/*"
-                  onChange={(e) =>
-                    setImageFile(e.target.files?.[0] || null)
-                  }
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                   disabled={uploadingImage}
                 />
               </label>
-              <p className="text-xs text-gray-500 mt-1">
-                JPG, PNG or GIF (Max 5MB)
-              </p>
+              <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF (Max 5MB)</p>
             </div>
 
             {/* INPUTS */}
@@ -316,6 +316,53 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* ✅ SUCCESS MODAL */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md transform transition-all animate-scaleUp">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+
+            <h2 className="text-2xl font-bold text-green-600 mb-3">
+              সফল হয়েছে!
+            </h2>
+
+            <p className="text-gray-600">
+              আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে।
+            </p>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes scaleUp {
+          from {
+            transform: scale(0.95);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        .animate-scaleUp {
+          animation: scaleUp 0.3s ease-out;
+        }
+      `}</style>
     </section>
   );
 }

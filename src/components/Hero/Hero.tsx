@@ -1,6 +1,32 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function Hero() {
+  const [totalDonors, setTotalDonors] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // ডাটা লোড করা
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        const response = await fetch("/api/users");
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+          setTotalDonors(data.length);
+        }
+      } catch (error) {
+        console.error("Error fetching donors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonors();
+  }, []);
+
   return (
     <section className="w-full bg-white py-20">
       <div className="max-w-6xl mx-auto px-4">
@@ -40,21 +66,32 @@ export default function Hero() {
               </Link>
             </div>
 
-            {/* ⚡ Small Stats */}
+            {/* ⚡ লাইভ স্ট্যাটস */}
             <div className="mt-10 flex gap-8 text-sm text-[var(--color-text-soft)]">
 
               <div>
                 <p className="text-2xl font-bold text-[var(--color-text-main)]">
-                  ১০০+
+                  {loading ? (
+                    <span className="inline-block w-10 h-8 bg-gray-200 animate-pulse rounded"></span>
+                  ) : (
+                    `${totalDonors}+`
+                  )}
                 </p>
                 <p>নিবন্ধিত রক্তদাতা</p>
               </div>
 
               <div>
                 <p className="text-2xl font-bold text-[var(--color-text-main)]">
-                  ২৪/৭
+                  24/7
                 </p>
                 <p>জরুরি সহায়তা</p>
+              </div>
+
+              <div>
+                <p className="text-2xl font-bold text-[var(--color-text-main)]">
+                  {new Date().getFullYear()}
+                </p>
+                <p>সেবা শুরু</p>
               </div>
 
             </div>
