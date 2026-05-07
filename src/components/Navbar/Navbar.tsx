@@ -46,12 +46,20 @@ export default function Navbar() {
     };
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!search.trim()) return;
-    router.push(`/donors?group=${search}`);
-    setSearch("");
-  };
+  // 🔍 সার্চ হ্যান্ডলার - এটি কাজ করবে
+ 
+// Navbar এর handleSearch ফাংশন আপডেট করুন
+// Navbar এর handleSearch (AB+ এর জন্য এনকোডিং যোগ করুন)
+const handleSearch = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!search.trim()) return;
+  
+  // URL এনকোডিং (AB+ কে AB%2B করবে)
+  const searchTerm = encodeURIComponent(search.trim().toUpperCase());
+  console.log("🔍 সার্চ টার্ম:", searchTerm);
+  router.push(`/donors?group=${searchTerm}`);
+  setSearch("");
+};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -81,7 +89,7 @@ export default function Navbar() {
               className="px-2 py-1.5 w-24 text-sm outline-none"
               placeholder="A+"
             />
-            <button className="bg-[var(--color-primary)] text-white px-2 text-sm">🔍</button>
+            <button type="submit" className="bg-[var(--color-primary)] text-white px-2 text-sm">🔍</button>
           </form>
 
           {/* প্রোফাইল আইকন (মোবাইলে) */}
@@ -119,9 +127,9 @@ export default function Navbar() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="px-4 py-2 w-44 outline-none"
-              placeholder="A+, B-"
+              placeholder="যেমন: A+, B-, O+"
             />
-            <button className="bg-[var(--color-primary)] text-white px-4">
+            <button type="submit" className="bg-[var(--color-primary)] text-white px-4">
               খুঁজুন
             </button>
           </form>
@@ -228,7 +236,6 @@ export default function Navbar() {
                     <span>👤</span> প্রোফাইল
                   </Link>
                   
-                  {/* 👇 লগআউট বাটন (হ্যামবার্গার মেনুতেই) */}
                   <button
                     onClick={() => {
                       handleLogout();
