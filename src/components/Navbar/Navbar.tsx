@@ -122,6 +122,9 @@ export default function Navbar() {
             <Link href="/donors" className={`transition ${isActive("/donors") ? "text-[var(--color-primary)] border-b-2 border-[var(--color-primary)] pb-1" : "hover:text-[var(--color-primary)]"}`}>
               রক্তদাতা
             </Link>
+            <Link href="/emergency-phone-number" className={`transition ${isActive("/emergency-phone-number") ? "text-[var(--color-primary)] border-b-2 border-[var(--color-primary)] pb-1" : "hover:text-[var(--color-primary)]"}`}>
+              জরুরী ফোন নাম্বার
+            </Link>
           </div>
 
           <form onSubmit={handleSearch} className="flex border rounded-lg overflow-hidden">
@@ -182,6 +185,7 @@ export default function Navbar() {
               <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🏠 হোম</Link>
               <Link href="/about" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">📖 আমাদের সম্পর্কে</Link>
               <Link href="/donors" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🩸 রক্তদাতা</Link>
+              <Link href="/emergency-phone-number" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🚨 জরুরী ফোন নাম্বার</Link>
               <hr className="my-2" />
               {token ? (
                 <>

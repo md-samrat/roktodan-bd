@@ -1,12 +1,17 @@
 import { connectDB } from "@/lib/mongodb";
 import UserModel from "@/models/users";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
+type Context = {
+  params: Promise<{ id: string }>;
+};
+
+/* -------------------- PUT (UPDATE USER) -------------------- */
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: Context
 ) {
   try {
     await connectDB();
@@ -14,7 +19,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // ID ভ্যালিডেশন
+    // ID validation
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, message: "Invalid user id" },
@@ -22,7 +27,7 @@ export async function PUT(
       );
     }
 
-    // ইউজার আপডেট
+    // Update user
     const updatedUser = await UserModel.findByIdAndUpdate(
       id,
       {
@@ -46,7 +51,7 @@ export async function PUT(
       );
     }
 
-    // নতুন টোকেন তৈরি
+    // Create JWT token
     const newToken = jwt.sign(
       {
         id: updatedUser._id,
@@ -70,6 +75,7 @@ export async function PUT(
     });
   } catch (error: any) {
     console.error("Update Error:", error);
+
     return NextResponse.json(
       {
         success: false,
@@ -80,15 +86,15 @@ export async function PUT(
   }
 }
 
-// ইউজার ডিটেইলস পাওয়ার জন্য GET মেথড
+/* -------------------- GET USER -------------------- */
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: Context
 ) {
   try {
     await connectDB();
 
-    const { id } = params;
+    const { id } = await params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -108,14 +114,15 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      user: user,
+      user,
     });
   } catch (error: any) {
     console.error("Get User Error:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message: error.message,
+        message: error.message || "Server error",
       },
       { status: 500 }
     );
