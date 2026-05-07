@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,11 +17,13 @@ export default function RegisterPage() {
   });
 
   const [showModal, setShowModal] = useState(false);
-  const [showAlreadyLoggedInModal, setShowAlreadyLoggedInModal] = useState(false);
+  const [showAlreadyLoggedInModal, setShowAlreadyLoggedInModal] =
+    useState(false);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
@@ -63,6 +65,17 @@ export default function RegisterPage() {
         setPhoneError("");
       }
     }
+
+    // Password validation
+    if (name === "password") {
+      if (!value) {
+        setPasswordError("");
+      } else if (value.length < 6) {
+        setPasswordError("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে");
+      } else {
+        setPasswordError("");
+      }
+    }
   };
 
   // আগে থেকে লগইন থাকলে প্রোফাইলে রিডাইরেক্ট
@@ -77,7 +90,6 @@ export default function RegisterPage() {
     localStorage.removeItem("user");
     setIsLoggedIn(false);
     setShowAlreadyLoggedInModal(false);
-    // ইভেন্ট ডিসপ্যাচ করে navbar আপডেট করা
     window.dispatchEvent(new Event("authChange"));
   };
 
@@ -90,8 +102,19 @@ export default function RegisterPage() {
       return;
     }
 
+    // Phone validation
     if (!bdPhoneRegex.test(formData.phoneNumber)) {
       setPhoneError("সঠিক বাংলাদেশি মোবাইল নাম্বার দিন (01XXXXXXXXX)");
+      return;
+    }
+
+    // Password validation
+    if (!formData.password) {
+      setPasswordError("পাসওয়ার্ড আবশ্যক");
+      return;
+    }
+    if (formData.password.length < 6) {
+      setPasswordError("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে");
       return;
     }
 
@@ -112,14 +135,23 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
-      console.log("Status:", res.status);
-      console.log("Response:", data);
 
       if (!res.ok) {
-        // ডুপ্লিকেট ফোন নাম্বার এরর চেক করা
-        if (res.status === 400 && data.message === "এই নাম্বার দিয়ে আগে থেকেই রেজিস্টার করা হয়েছে") {
+        // ডুপ্লিকেট ফোন নাম্বার এরর
+        if (res.status === 400 && 
+            (data.message === "এই নাম্বার দিয়ে আগে থেকেই রেজিস্টার করা হয়েছে" ||
+             data.message?.includes("phoneNumber"))) {
           setShowDuplicateModal(true);
-        } else {
+        }
+        // পাসওয়ার্ড ভ্যালিডেশন এরর
+        else if (data.message?.includes("পাসওয়ার্ড") || 
+                 data.message?.includes("password") ||
+                 data.message?.includes("৬ অক্ষর")) {
+          setErrorMessage("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে");
+          setShowErrorModal(true);
+        }
+        // অন্যান্য এরর
+        else {
           setErrorMessage(data.message || data.error || "রেজিস্ট্রেশন failed");
           setShowErrorModal(true);
         }
@@ -128,25 +160,22 @@ export default function RegisterPage() {
 
       // Success - show modal
       setShowModal(true);
-      
+
       // Save token if exists
       if (data.token) {
         localStorage.setItem("token", data.token);
-        
-        // Navbar রিলোড ছাড়াই আপডেট হবে
         window.dispatchEvent(new Event("authChange"));
       }
-      
+
       // Save user data if exists
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
       }
-      
+
       // Redirect to profile after 2 seconds
       setTimeout(() => {
         router.push("/profile");
       }, 2000);
-      
     } catch (error) {
       console.error("Network or parsing error:", error);
       setErrorMessage("নেটওয়ার্ক সমস্যা হয়েছে। আবার চেষ্টা করুন।");
@@ -182,7 +211,6 @@ export default function RegisterPage() {
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               পুরো নাম
             </label>
-
             <input
               type="text"
               name="name"
@@ -199,7 +227,6 @@ export default function RegisterPage() {
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               মোবাইল নাম্বার
             </label>
-
             <input
               type="tel"
               name="phoneNumber"
@@ -209,7 +236,6 @@ export default function RegisterPage() {
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[var(--color-primary)] transition-colors"
               required
             />
-
             {phoneError && (
               <p className="mt-2 text-sm text-red-500">{phoneError}</p>
             )}
@@ -220,7 +246,6 @@ export default function RegisterPage() {
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               রক্তের গ্রুপ
             </label>
-
             <select
               name="bloodGroup"
               value={formData.bloodGroup}
@@ -245,7 +270,6 @@ export default function RegisterPage() {
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               লিঙ্গ
             </label>
-
             <select
               name="gender"
               value={formData.gender}
@@ -265,7 +289,6 @@ export default function RegisterPage() {
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               গ্রাম / এলাকা
             </label>
-
             <input
               type="text"
               name="address"
@@ -282,7 +305,6 @@ export default function RegisterPage() {
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
               সর্বশেষ রক্তদানের তারিখ (যদি থাকে)
             </label>
-
             <input
               type="date"
               name="lastDonationDate"
@@ -295,9 +317,8 @@ export default function RegisterPage() {
           {/* Password */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              পাসওয়ার্ড
+              পাসওয়ার্ড <span className="text-red-500 text-sm">(কমপক্ষে ৬ অক্ষর)</span>
             </label>
-
             <input
               type="password"
               name="password"
@@ -307,6 +328,9 @@ export default function RegisterPage() {
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[var(--color-primary)] transition-colors"
               required
             />
+            {passwordError && (
+              <p className="mt-2 text-sm text-red-500">{passwordError}</p>
+            )}
           </div>
 
           {/* Submit */}
@@ -323,29 +347,14 @@ export default function RegisterPage() {
       {/* Success Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md transform transition-all">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-
             <h2 className="text-2xl font-bold text-green-600 mb-3">স্বাগতম!</h2>
-
-            <p className="text-gray-600 mb-4">
-              আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। প্রোফাইলে নিয়ে যাওয়া হচ্ছে...
-            </p>
-            
+            <p className="text-gray-600 mb-4">আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। প্রোফাইলে নিয়ে যাওয়া হচ্ছে...</p>
             <div className="flex justify-center">
               <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
             </div>
@@ -356,173 +365,61 @@ export default function RegisterPage() {
       {/* Already Logged In Modal */}
       {showAlreadyLoggedInModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md transform transition-all">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
+              <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-
-            <h2 className="text-2xl font-bold text-yellow-600 mb-3">
-              আপনি ইতিমধ্যে লগইন করেছেন!
-            </h2>
-
-            <p className="text-gray-600 mb-2">
-              হ্যালো <span className="font-semibold text-[var(--color-primary)]">{userName}</span>,
-            </p>
-
-            <p className="text-gray-600 mb-6">
-              আপনি ইতিমধ্যে একটি অ্যাকাউন্ট দিয়ে লগইন করে আছেন। 
-              নতুন অ্যাকাউন্ট তৈরি করতে চাইলে প্রথমে লগআউট করুন।
-            </p>
-
+            <h2 className="text-2xl font-bold text-yellow-600 mb-3">আপনি ইতিমধ্যে লগইন করেছেন!</h2>
+            <p className="text-gray-600 mb-6">আপনি ইতিমধ্যে একটি অ্যাকাউন্ট দিয়ে লগইন করে আছেন। নতুন অ্যাকাউন্ট তৈরি করতে চাইলে প্রথমে লগআউট করুন।</p>
             <div className="flex flex-col gap-3">
-              <button
-                onClick={handleGoToProfile}
-                className="w-full bg-[var(--color-primary)] text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-all duration-300"
-              >
-                প্রোফাইলে যান
-              </button>
-
-              <button
-                onClick={handleLogoutAndRegister}
-                className="w-full border border-red-500 text-red-500 py-3 rounded-lg font-medium hover:bg-red-50 transition-all duration-300"
-              >
-                লগআউট করে নতুন রেজিস্ট্রেশন
-              </button>
-
-              <button
-                onClick={() => setShowAlreadyLoggedInModal(false)}
-                className="w-full text-gray-500 py-2 rounded-lg font-medium hover:text-gray-700 transition-all duration-300"
-              >
-                বন্ধ করুন
-              </button>
+              <button onClick={handleGoToProfile} className="w-full bg-[var(--color-primary)] text-white py-3 rounded-lg font-medium">প্রোফাইলে যান</button>
+              <button onClick={handleLogoutAndRegister} className="w-full border border-red-500 text-red-500 py-3 rounded-lg font-medium">লগআউট করে নতুন রেজিস্ট্রেশন</button>
+              <button onClick={() => setShowAlreadyLoggedInModal(false)} className="w-full text-gray-500 py-2 rounded-lg font-medium">বন্ধ করুন</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Duplicate Phone Number Modal */}
+      {/* Duplicate Phone Modal */}
       {showDuplicateModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md transform transition-all">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-
-            <h2 className="text-2xl font-bold text-red-600 mb-3">
-              ফোন নাম্বার ইতিমধ্যে রেজিস্টার করা আছে!
-            </h2>
-
-            <p className="text-gray-600 mb-2">
-              এই <span className="font-semibold text-red-600">{formData.phoneNumber}</span> নাম্বারটি
-            </p>
-
-            <p className="text-gray-600 mb-6">
-              আগে থেকেই রেজিস্টার করা আছে। আপনি কি ইতিমধ্যে রেজিস্ট্রেশন করে থাকেন?
-            </p>
-
+            <h2 className="text-2xl font-bold text-red-600 mb-3">ফোন নাম্বার ইতিমধ্যে রেজিস্টার করা আছে!</h2>
+            <p className="text-gray-600 mb-6">এই নাম্বারটি আগে থেকেই রেজিস্টার করা আছে। আপনি কি ইতিমধ্যে রেজিস্ট্রেশন করে থাকেন?</p>
             <div className="flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  setShowDuplicateModal(false);
-                  router.push("/login");
-                }}
-                className="w-full bg-[var(--color-primary)] text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-all duration-300"
-              >
-                লগইন পেজে যান
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowDuplicateModal(false);
-                  // ফর্ম রিসেট করুন
-                  setFormData({
-                    ...formData,
-                    phoneNumber: "",
-                  });
-                }}
-                className="w-full border border-blue-500 text-blue-500 py-3 rounded-lg font-medium hover:bg-blue-50 transition-all duration-300"
-              >
-                ভিন্ন নাম্বার দিয়ে চেষ্টা করুন
-              </button>
-
-              <button
-                onClick={() => setShowDuplicateModal(false)}
-                className="w-full text-gray-500 py-2 rounded-lg font-medium hover:text-gray-700 transition-all duration-300"
-              >
-                বন্ধ করুন
-              </button>
+              <button onClick={() => { setShowDuplicateModal(false); router.push("/login"); }} className="w-full bg-[var(--color-primary)] text-white py-3 rounded-lg font-medium">লগইন পেজে যান</button>
+              <button onClick={() => setShowDuplicateModal(false)} className="w-full text-gray-500 py-2 rounded-lg font-medium">বন্ধ করুন</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* General Error Modal */}
+      {/* Error Modal */}
       {showErrorModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md transform transition-all">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl w-[90%] max-w-md">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-
-            <h2 className="text-2xl font-bold text-red-600 mb-3">
-              সমস্যা হয়েছে!
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              {errorMessage}
-            </p>
-
-            <button
-              onClick={() => setShowErrorModal(false)}
-              className="w-full bg-[var(--color-primary)] text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-all duration-300"
-            >
-              আবার চেষ্টা করুন
-            </button>
+            <h2 className="text-2xl font-bold text-red-600 mb-3">সমস্যা হয়েছে!</h2>
+            <p className="text-gray-600 mb-6">{errorMessage}</p>
+            <button onClick={() => setShowErrorModal(false)} className="w-full bg-[var(--color-primary)] text-white py-3 rounded-lg font-medium">আবার চেষ্টা করুন</button>
           </div>
         </div>
       )}
 
       <style jsx>{`
         @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
+          to { transform: rotate(360deg); }
         }
         .animate-spin {
           animation: spin 1s linear infinite;

@@ -116,24 +116,33 @@ export default function ProfilePage() {
         throw new Error(result.message || "Update failed");
       }
 
-      // নতুন টোকেন স্টোর করা
+      // নতুন টোকেন স্টোর করা এবং ডাটা আপডেট
       if (result.token) {
         localStorage.setItem("token", result.token);
-        // Navbar আপডেটের জন্য
+        
+        // নতুন টোকেন থেকে ইউজার ডাটা এক্সট্রাক্ট করুন
+        const base64Payload = result.token.split(".")[1];
+        const payload = JSON.parse(atob(base64Payload));
+        
+        // লোকাল স্টেট আপডেট করুন
+        setUserData({
+          id: payload.id || "",
+          name: payload.name || "",
+          phoneNumber: payload.phoneNumber || "",
+          bloodGroup: payload.bloodGroup || "",
+          address: payload.address || "",
+          gender: payload.gender || "",
+          profileImage: payload.profileImage || imageUrl,
+          email: payload.email || "",
+        });
+        
+        // Navbar এবং Donors পেজ আপডেটের জন্য ইভেন্ট ডিসপ্যাচ
         window.dispatchEvent(new Event("authChange"));
+        window.dispatchEvent(new Event("profileUpdated"));
       }
-
-      // লোকাল স্টেট আপডেট
-      setUserData((prev) => ({
-        ...prev,
-        ...updateData,
-        profileImage: imageUrl,
-      }));
 
       setEditOpen(false);
       setImageFile(null);
-      
-      // ✅ অ্যালার্টের পরিবর্তে মডাল দেখান
       setShowSuccessModal(true);
       
       // 2 সেকেন্ড পর মডাল বন্ধ করুন

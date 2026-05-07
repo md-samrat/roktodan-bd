@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,16 +38,20 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
-      console.log("Response status:", res.status);
-      console.log("Response data:", data);
+      // console.log("Response status:", res.status);
+      // console.log("Response data:", data);
 
       if (!res.ok) {
         if (res.status === 404) {
-          setErrorMessage("এই মোবাইল নাম্বারটি আমাদের সিস্টেমে পাওয়া যায়নি। আগে রেজিস্ট্রেশন করুন।");
+          setErrorMessage(
+            "এই মোবাইল নাম্বারটি আমাদের সিস্টেমে পাওয়া যায়নি। আগে রেজিস্ট্রেশন করুন।",
+          );
         } else if (res.status === 401) {
           setErrorMessage("পাসওয়ার্ড ভুল। অনুগ্রহ করে সঠিক পাসওয়ার্ড দিন।");
         } else {
-          setErrorMessage(data.message || "লগইন করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+          setErrorMessage(
+            data.message || "লগইন করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+          );
         }
         setErrorModal(true);
         setLoading(false);
@@ -72,17 +76,13 @@ export default function LoginPage() {
   return (
     <section className="w-full py-20 min-h-screen flex items-center">
       <div className="max-w-2xl mx-auto px-4 w-full">
-
         {/* Heading */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold">
-            লগইন করুন
-          </h1>
+          <h1 className="text-4xl font-bold">লগইন করুন</h1>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="card p-8 space-y-6">
-
           <input
             type="text"
             name="phoneNumber"
@@ -124,18 +124,17 @@ export default function LoginPage() {
       {errorModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 text-center w-[90%] max-w-md shadow-xl">
-
             <div className="text-5xl mb-4">
               {errorMessage.includes("পাসওয়ার্ড") ? "🔐" : "⚠️"}
             </div>
 
             <h2 className="text-2xl font-bold text-red-600">
-              {errorMessage.includes("পাসওয়ার্ড") ? "পাসওয়ার্ড ভুল!" : "ইউজার পাওয়া যায়নি!"}
+              {errorMessage.includes("পাসওয়ার্ড")
+                ? "পাসওয়ার্ড ভুল!"
+                : "ইউজার পাওয়া যায়নি!"}
             </h2>
 
-            <p className="text-gray-600 mt-3 leading-7">
-              {errorMessage}
-            </p>
+            <p className="text-gray-600 mt-3 leading-7">{errorMessage}</p>
 
             <div className="mt-6 flex gap-3 justify-center">
               <button

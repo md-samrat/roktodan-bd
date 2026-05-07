@@ -4,22 +4,16 @@ import { useState } from "react";
 import { FiCopy, FiCheck, FiHeart } from "react-icons/fi";
 
 export default function DonationSection() {
-  const [copiedBkash, setCopiedBkash] = useState(false);
-  const [copiedNagad, setCopiedNagad] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleCopyNumber = (number: string, type: string) => {
-    navigator.clipboard.writeText(number);
-    if (type === "bkash") {
-      setCopiedBkash(true);
-      setTimeout(() => setCopiedBkash(false), 2000);
-    } else {
-      setCopiedNagad(true);
-      setTimeout(() => setCopiedNagad(false), 2000);
-    }
+  const handleCopyNumber = () => {
+    navigator.clipboard.writeText("01861790495");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <section className="w-full py-16 ">
+    <section className="w-full py-16">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
@@ -38,66 +32,33 @@ export default function DonationSection() {
           </p>
         </div>
 
-        {/* Donation Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* bKash Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition">
-            <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        {/* Single Donation Card */}
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl transition">
+            <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">📱</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">bKash</h3>
+            
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              bKash / নগদ
+            </h3>
+            
             
 
             <div className="bg-gray-50 rounded-lg p-3 mb-4">
-              <code className="text-lg font-mono text-gray-800">
-                01861790495
-              </code>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleCopyNumber("01861790495", "bkash")}
-                className="flex-1 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
-              >
-                {copiedBkash ? (
-                  <>
-                    <FiCheck /> কপি হয়েছে
-                  </>
-                ) : (
-                  <>
-                    <FiCopy /> নম্বর কপি করুন
-                  </>
-                )}
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-400 mt-3">
-              Send Money করুন "রক্তদান" লিখে
-            </p>
-          </div>
-
-          {/* Nagad Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition">
-            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📱</span>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">নগদ</h3>
-            
-
-            <div className="bg-gray-50 rounded-lg p-3 mb-4">
-              <code className="text-lg font-mono text-gray-800">
+              <code className="text-xl font-mono text-gray-800 font-bold">
                 01745240014
               </code>
             </div>
 
             <div className="flex gap-3">
               <button
-                onClick={() => handleCopyNumber("01745240014", "nagad")}
-                className="flex-1 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+                onClick={handleCopyNumber}
+                className="flex-1 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
               >
-                {copiedNagad ? (
+                {copied ? (
                   <>
-                    <FiCheck /> কপি হয়েছে
+                    <FiCheck /> নম্বর কপি হয়েছে
                   </>
                 ) : (
                   <>
@@ -107,11 +68,22 @@ export default function DonationSection() {
               </button>
             </div>
 
-            <p className="text-xs text-gray-400 mt-3">
-              Send Money করুন "রক্তদান" লিখে
+            <p className="text-xs text-gray-400 mt-4">
+              Send Money করুন <span className="font-semibold">"রক্তদান"</span> লিখে
             </p>
+
+            {/* Dual Logo */}
+            <div className="flex justify-center gap-4 mt-4 pt-3 border-t">
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-semibold text-pink-600">bKash</span>
+                <span className="text-gray-400">|</span>
+                <span className="text-sm font-semibold text-orange-600">নগদ</span>
+              </div>
+            </div>
           </div>
         </div>
+
+       
       </div>
     </section>
   );

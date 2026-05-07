@@ -11,7 +11,7 @@ export default function Hero() {
   useEffect(() => {
     const fetchDonors = async () => {
       try {
-        const response = await fetch("/api/users");
+        const response = await fetch("/api/public-donors");
         const data = await response.json();
         
         if (Array.isArray(data)) {

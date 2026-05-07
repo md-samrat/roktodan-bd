@@ -56,6 +56,11 @@ export default function Footer() {
                 রক্তদাতা খুঁজুন
               </Link>
             </li>
+            <li>
+              <Link href="/emergency-phone-number" className="hover:underline">
+                জরুরী ফোন নাম্বার
+              </Link>
+            </li>
           </ul>
         </div>
 
