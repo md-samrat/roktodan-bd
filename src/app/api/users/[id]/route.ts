@@ -61,7 +61,7 @@ export async function PUT(
         address: updatedUser.address,
         gender: updatedUser.gender,
         profileImage: updatedUser.profileImage,
-        email: updatedUser.email,
+        
       },
       process.env.JWT_SECRET || "your_secret_key_here",
       { expiresIn: "7d" }
