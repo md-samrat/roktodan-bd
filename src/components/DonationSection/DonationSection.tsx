@@ -4,12 +4,19 @@ import { useState } from "react";
 import { FiCopy, FiCheck, FiHeart } from "react-icons/fi";
 
 export default function DonationSection() {
-  const [copied, setCopied] = useState(false);
+  const [copiedBkash, setCopiedBkash] = useState(false);
+  const [copiedNagad, setCopiedNagad] = useState(false);
 
-  const handleCopyNumber = () => {
+  const handleCopyBkash = () => {
     navigator.clipboard.writeText("01861790495");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedBkash(true);
+    setTimeout(() => setCopiedBkash(false), 2000);
+  };
+
+  const handleCopyNagad = () => {
+    navigator.clipboard.writeText("01334610647");
+    setCopiedNagad(true);
+    setTimeout(() => setCopiedNagad(false), 2000);
   };
 
   return (
@@ -32,58 +39,88 @@ export default function DonationSection() {
           </p>
         </div>
 
-        {/* Single Donation Card */}
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl transition">
-            <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📱</span>
+        {/* Two Donation Cards Side by Side */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          
+          {/* bKash Card */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition">
+            <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📱</span>
             </div>
             
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              bKash / নগদ
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              bKash
             </h3>
             
-            
-
             <div className="bg-gray-50 rounded-lg p-3 mb-4">
-              <code className="text-xl font-mono text-gray-800 font-bold">
-                01745240014
+              <code className="text-lg font-mono text-gray-800 font-bold">
+                01861790495
               </code>
             </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={handleCopyNumber}
-                className="flex-1 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
-              >
-                {copied ? (
-                  <>
-                    <FiCheck /> নম্বর কপি হয়েছে
-                  </>
-                ) : (
-                  <>
-                    <FiCopy /> নম্বর কপি করুন
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              onClick={handleCopyBkash}
+              className="w-full py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+            >
+              {copiedBkash ? (
+                <>
+                  <FiCheck /> নম্বর কপি হয়েছে
+                </>
+              ) : (
+                <>
+                  <FiCopy /> নম্বর কপি করুন
+                </>
+              )}
+            </button>
 
-            <p className="text-xs text-gray-400 mt-4">
+            <p className="text-xs text-gray-400 mt-3">
               Send Money করুন <span className="font-semibold">"রক্তদান"</span> লিখে
             </p>
+          </div>
 
-            {/* Dual Logo */}
-            <div className="flex justify-center gap-4 mt-4 pt-3 border-t">
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-pink-600">bKash</span>
-                <span className="text-gray-400">|</span>
-                <span className="text-sm font-semibold text-orange-600">নগদ</span>
-              </div>
+          {/* Nagad Card */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg text-center hover:shadow-xl transition">
+            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📱</span>
             </div>
+            
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              নগদ
+            </h3>
+            
+            <div className="bg-gray-50 rounded-lg p-3 mb-4">
+              <code className="text-lg font-mono text-gray-800 font-bold">
+                01334610647
+              </code>
+            </div>
+
+            <button
+              onClick={handleCopyNagad}
+              className="w-full py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+            >
+              {copiedNagad ? (
+                <>
+                  <FiCheck /> নম্বর কপি হয়েছে
+                </>
+              ) : (
+                <>
+                  <FiCopy /> নম্বর কপি করুন
+                </>
+              )}
+            </button>
+
+            <p className="text-xs text-gray-400 mt-3">
+              Send Money করুন <span className="font-semibold">"রক্তদান"</span> লিখে
+            </p>
           </div>
         </div>
 
-       
+        {/* Footer Note */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-400">
+            🙏 আপনার সহযোগিতা আমাদের অনুপ্রাণিত করে। ধন্যবাদ!
+          </p>
+        </div>
       </div>
     </section>
   );
