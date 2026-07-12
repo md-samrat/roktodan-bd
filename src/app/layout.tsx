@@ -11,8 +11,8 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "রক্তদান",
-  description: "Blood donation platform for Cumilla",
+  title: "রক্তদান - জীবন বাঁচানোর সংগ্রাম",
+  description: "বাংলাদেশের বৃহত্তম রক্তদান প্ল্যাটফর্ম",
 };
 
 export default function RootLayout({
@@ -20,6 +20,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${lora.variable} h-full antialiased`}>
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1838519377820773"
+          crossorigin="anonymous"
+        />
+      </head>
       <body className="min-h-full flex flex-col font-serif">
         <header>
           <Navbar />
