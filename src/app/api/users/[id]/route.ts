@@ -8,10 +8,20 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-it";
 // ✅ GET: নির্দিষ্ট ইউজারের ডেটা
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // ✅ Promise type
 ) {
   try {
+    // ✅ params কে await করতে হবে
     const { id } = await params;
+    
+    console.log("GET /api/users/[id] - ID:", id);
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
+    }
 
     // ✅ Authorization header থেকে token নেওয়া
     const authHeader = request.headers.get("authorization");
@@ -26,8 +36,17 @@ export async function GET(
 
     // ✅ Token verify
     try {
-      jwt.verify(token, JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      
+      // ✅ ইউজার ম্যাচ চেক
+      if (decoded.id !== id) {
+        return NextResponse.json(
+          { error: "You can only access your own profile" },
+          { status: 403 }
+        );
+      }
     } catch (error) {
+      console.error("Token verification failed:", error);
       return NextResponse.json(
         { error: "Invalid token" },
         { status: 401 }
@@ -74,10 +93,21 @@ export async function GET(
 // ✅ PUT: ইউজার আপডেট
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // ✅ Promise type
 ) {
   try {
+    // ✅ params কে await করতে হবে
     const { id } = await params;
+    
+    console.log("PUT /api/users/[id] - ID:", id);
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
     const body = await request.json();
     const { name, phoneNumber, bloodGroup, address, gender, profileImage } = body;
 
