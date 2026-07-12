@@ -14,6 +14,7 @@ export default function RegisterPage() {
     gender: "",
     lastDonationDate: "",
     password: "",
+    
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -121,9 +122,16 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      // Prisma model অনুযায়ী ডেটা প্রস্তুত করা
       const submitData = {
-        ...formData,
-        lastDonationDate: formData.lastDonationDate || undefined,
+        name: formData.name,
+        phoneNumber: formData.phoneNumber,
+        bloodGroup: formData.bloodGroup,
+        address: formData.address,
+        gender: formData.gender,
+        lastDonationDate: formData.lastDonationDate ? new Date(formData.lastDonationDate).toISOString() : null,
+        password: formData.password,
+       
       };
 
       const res = await fetch("/api/users", {
@@ -135,12 +143,14 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
+      // console.log(data)
 
       if (!res.ok) {
         // ডুপ্লিকেট ফোন নাম্বার এরর
         if (res.status === 400 && 
             (data.message === "এই নাম্বার দিয়ে আগে থেকেই রেজিস্টার করা হয়েছে" ||
-             data.message?.includes("phoneNumber"))) {
+             data.message?.includes("phoneNumber") ||
+             data.message?.includes("Phone number already exists"))) {
           setShowDuplicateModal(true);
         }
         // পাসওয়ার্ড ভ্যালিডেশন এরর
@@ -209,7 +219,7 @@ export default function RegisterPage() {
           {/* Name */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              পুরো নাম
+              পুরো নাম <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -225,7 +235,7 @@ export default function RegisterPage() {
           {/* Phone */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              মোবাইল নাম্বার
+              মোবাইল নাম্বার <span className="text-red-500">*</span>
             </label>
             <input
               type="tel"
@@ -244,7 +254,7 @@ export default function RegisterPage() {
           {/* Blood Group */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              রক্তের গ্রুপ
+              রক্তের গ্রুপ <span className="text-red-500">*</span>
             </label>
             <select
               name="bloodGroup"
@@ -268,7 +278,7 @@ export default function RegisterPage() {
           {/* Gender */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              লিঙ্গ
+              লিঙ্গ <span className="text-red-500">*</span>
             </label>
             <select
               name="gender"
@@ -287,7 +297,7 @@ export default function RegisterPage() {
           {/* Address */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              গ্রাম / এলাকা
+              গ্রাম / এলাকা <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -312,12 +322,14 @@ export default function RegisterPage() {
               onChange={handleChange}
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[var(--color-primary)] transition-colors"
             />
+            <p className="mt-1 text-xs text-gray-400">বাংলাদেশি সময় অনুযায়ী তারিখ নির্বাচন করুন</p>
           </div>
 
           {/* Password */}
           <div>
             <label className="block mb-2 font-medium text-[var(--color-text-main)]">
-              পাসওয়ার্ড <span className="text-red-500 text-sm">(কমপক্ষে ৬ অক্ষর)</span>
+              পাসওয়ার্ড <span className="text-red-500">*</span>
+              <span className="text-red-500 text-sm ml-2">(কমপক্ষে ৬ অক্ষর)</span>
             </label>
             <input
               type="password"
@@ -327,11 +339,14 @@ export default function RegisterPage() {
               placeholder="একটি শক্তিশালী পাসওয়ার্ড দিন"
               className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[var(--color-primary)] transition-colors"
               required
+              minLength={6}
             />
             {passwordError && (
               <p className="mt-2 text-sm text-red-500">{passwordError}</p>
             )}
           </div>
+
+        
 
           {/* Submit */}
           <button
@@ -341,6 +356,14 @@ export default function RegisterPage() {
           >
             {loading ? "রেজিস্ট্রেশন হচ্ছে..." : "রেজিস্ট্রেশন সম্পন্ন করুন"}
           </button>
+
+          {/* Login Link */}
+          <p className="text-center text-gray-600">
+            ইতিমধ্যে অ্যাকাউন্ট আছে?{" "}
+            <a href="/login" className="text-[var(--color-primary)] hover:underline font-medium">
+              লগইন করুন
+            </a>
+          </p>
         </form>
       </div>
 
