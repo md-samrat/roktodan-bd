@@ -11,20 +11,26 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "রক্তদান - জীবন বাঁচানোর সংগ্রাম",
+  title: {
+    default: "রক্তদান - জীবন বাঁচানোর সংগ্রাম",
+    template: "%s | রক্তদান",
+  },
   description: "বাংলাদেশের বৃহত্তম রক্তদান প্ল্যাটফর্ম",
+  keywords: ["রক্তদান", "ব্লাড ডোনেশন", "বাংলাদেশ", "জরুরি সেবা"],
+  authors: [{ name: "রক্তদান টিম" }],
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${lora.variable} h-full antialiased`}>
+    <html lang="bn" className={`${lora.variable} h-full antialiased`}>
       <head>
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1838519377820773"
-          crossorigin="anonymous"
+          crossOrigin="anonymous"
         />
       </head>
       <body className="min-h-full flex flex-col font-serif">
@@ -32,7 +38,9 @@ export default function RootLayout({
           <Navbar />
         </header>
 
-        {children}
+        <main className="flex-1">
+          {children}
+        </main>
 
         <footer>
           <Footer />
