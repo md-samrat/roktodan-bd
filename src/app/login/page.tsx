@@ -10,7 +10,6 @@ export default function LoginPage() {
     phoneNumber: "",
     password: "",
   });
-
   const [errorModal, setErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +27,8 @@ export default function LoginPage() {
     setErrorModal(false);
 
     try {
-      // ✅ সঠিক API endpoint (এটা চেক করুন)
+      //console.log("1. Login attempt with:", formData);
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -37,9 +37,10 @@ export default function LoginPage() {
         body: JSON.stringify(formData),
       });
 
+      //console.log("2. Response status:", res.status);
+
       const data = await res.json();
-      // console.log("Response status:", res.status);
-      // console.log("Response data:", data);
+      //console.log("3. Response data:", data);
 
       if (!res.ok) {
         if (res.status === 404) {
@@ -59,10 +60,24 @@ export default function LoginPage() {
       }
 
       if (data.token) {
+        //console.log("4. Token received:", data.token);
         localStorage.setItem("token", data.token);
-        // Navbar আপডেটের জন্য ইভেন্ট ডিসপ্যাচ
+        //console.log("5. Token stored in localStorage");
+        
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          //console.log("6. User data stored:", data.user);
+        }
+        
         window.dispatchEvent(new Event("authChange"));
+        //console.log("7. authChange event dispatched");
+        
+        //console.log("8. Redirecting to /profile");
         router.push("/profile");
+      } else {
+        console.error("No token in response");
+        setErrorMessage("Token পাওয়া যায়নি। আবার চেষ্টা করুন।");
+        setErrorModal(true);
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -76,12 +91,10 @@ export default function LoginPage() {
   return (
     <section className="w-full py-20 min-h-screen flex items-center">
       <div className="max-w-2xl mx-auto px-4 w-full">
-        {/* Heading */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold">লগইন করুন</h1>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="card p-8 space-y-6">
           <input
             type="text"
@@ -120,22 +133,18 @@ export default function LoginPage() {
         </form>
       </div>
 
-      {/* Error Modal */}
       {errorModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 text-center w-[90%] max-w-md shadow-xl">
             <div className="text-5xl mb-4">
               {errorMessage.includes("পাসওয়ার্ড") ? "🔐" : "⚠️"}
             </div>
-
             <h2 className="text-2xl font-bold text-red-600">
               {errorMessage.includes("পাসওয়ার্ড")
                 ? "পাসওয়ার্ড ভুল!"
                 : "ইউজার পাওয়া যায়নি!"}
             </h2>
-
             <p className="text-gray-600 mt-3 leading-7">{errorMessage}</p>
-
             <div className="mt-6 flex gap-3 justify-center">
               <button
                 onClick={() => setErrorModal(false)}
@@ -143,7 +152,6 @@ export default function LoginPage() {
               >
                 বন্ধ করুন
               </button>
-
               {errorMessage.includes("পাওয়া যায়নি") && (
                 <Link href="/register">
                   <button className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:bg-green-700 transition">

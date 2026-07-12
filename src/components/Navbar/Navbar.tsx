@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
@@ -13,8 +13,8 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // টোকেন লোড করার ফাংশন
-  const loadToken = () => {
+  // ✅ টোকেন লোড করার ফাংশন (memoized)
+  const loadToken = useCallback(() => {
     const t = localStorage.getItem("token");
     setToken(t);
     
@@ -25,16 +25,18 @@ export default function Navbar() {
         setUser(payload);
       } catch (error) {
         console.error("Invalid token");
+        setUser(null);
       }
     } else {
       setUser(null);
     }
-  };
+  }, []);
 
+  // ✅ টোকেন লোড এবং ইভেন্ট লিসেনার
   useEffect(() => {
     loadToken();
 
-    // 👇 এই ইভেন্ট লিসেনারটা গুরুত্বপূর্ণ
+    // 👇 ইভেন্ট লিসেনার
     const handleStorageChange = () => {
       loadToken();
     };
@@ -46,7 +48,7 @@ export default function Navbar() {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("authChange", handleStorageChange);
     };
-  }, []);
+  }, [loadToken]);
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -58,13 +60,31 @@ export default function Navbar() {
     const searchTerm = encodeURIComponent(search.trim().toUpperCase());
     router.push(`/donors?group=${searchTerm}`);
     setSearch("");
+    setOpen(false); // মোবাইলে সার্চ করলে মেনু বন্ধ
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     loadToken();
-    window.dispatchEvent(new Event("storage"));
+    window.dispatchEvent(new Event("authChange"));
+    setOpen(false);
     router.push("/");
+  };
+
+  // ✅ প্রোফাইল ছবি বা অ্যাভাটার
+  const getProfileImage = () => {
+    if (user?.profileImage) {
+      return user.profileImage;
+    }
+    // UI Avatars API
+    const name = user?.name || "User";
+    return `https://ui-avatars.com/api/?background=0D8F81&color=fff&name=${encodeURIComponent(name)}&size=128`;
+  };
+
+  // ✅ ইউজারের প্রথম অক্ষর (fallback)
+  const getInitial = () => {
+    return user?.name?.charAt(0)?.toUpperCase() || "U";
   };
 
   return (
@@ -86,7 +106,7 @@ export default function Navbar() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="px-2 py-1.5 w-24 text-sm outline-none"
-              placeholder="A+"
+              placeholder="যেমন: A+"
             />
             <button type="submit" className="bg-[var(--color-primary)] text-white px-2 text-sm">🔍</button>
           </form>
@@ -94,9 +114,12 @@ export default function Navbar() {
           {token ? (
             <Link href="/profile">
               <img
-                src={user?.profileImage || "/profile.png"}
+                src={getProfileImage()}
                 alt="profile"
                 className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?background=0D8F81&color=fff&name=${encodeURIComponent(user?.name || "User")}&size=128`;
+                }}
               />
             </Link>
           ) : (
@@ -134,19 +157,32 @@ export default function Navbar() {
               className="px-4 py-2 w-44 outline-none"
               placeholder="যেমন: A+, B-, O+"
             />
-            <button type="submit" className="bg-[var(--color-primary)] text-white px-4">খুঁজুন</button>
+            <button type="submit" className="bg-[var(--color-primary)] text-white px-4 hover:bg-green-700 transition">
+              খুঁজুন
+            </button>
           </form>
 
           <div className="flex items-center gap-3">
             {token ? (
               <>
                 <Link href="/profile">
-                  <div className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1 rounded-lg">
-                    <img src={user?.profileImage || "/profile.png"} className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] object-cover" />
-                    <span className="text-sm font-medium">{user?.name || "প্রোফাইল"}</span>
+                  <div className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1 rounded-lg transition">
+                    <img 
+                      src={getProfileImage()} 
+                      className="w-8 h-8 rounded-full border-2 border-[var(--color-primary)] object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?background=0D8F81&color=fff&name=${encodeURIComponent(user?.name || "User")}&size=128`;
+                      }}
+                    />
+                    <span className="text-sm font-medium hidden lg:block">{user?.name || "প্রোফাইল"}</span>
                   </div>
                 </Link>
-                <button onClick={handleLogout} className="px-3 py-1.5 border rounded-lg text-red-500 hover:bg-red-50 transition">লগআউট</button>
+                <button 
+                  onClick={handleLogout} 
+                  className="px-3 py-1.5 border rounded-lg text-red-500 hover:bg-red-50 transition"
+                >
+                  লগআউট
+                </button>
               </>
             ) : (
               <>
@@ -154,7 +190,7 @@ export default function Navbar() {
                   <button className="btn-primary px-4 py-1.5">রেজিস্ট্রেশন</button>
                 </Link>
                 <Link href="/login">
-                  <button className="px-4 py-1.5 border rounded-lg hover:bg-gray-50">লগইন</button>
+                  <button className="px-4 py-1.5 border rounded-lg hover:bg-gray-50 transition">লগইন</button>
                 </Link>
               </>
             )}
@@ -162,42 +198,83 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* হ্যামবার্গার মেনু */}
+      {/* 📱 হ্যামবার্গার মেনু */}
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setOpen(false)}>
-          <div className="bg-white w-72 h-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white w-72 h-full p-6 shadow-xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            
+            {/* হেডার */}
             <div className="flex justify-between items-center mb-6 pb-4 border-b">
               {token ? (
                 <div className="flex items-center gap-3">
-                  <img src={user?.profileImage || "/profile.png"} className="w-12 h-12 rounded-full border-2 border-[var(--color-primary)] object-cover" />
+                  <img 
+                    src={getProfileImage()} 
+                    className="w-12 h-12 rounded-full border-2 border-[var(--color-primary)] object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?background=0D8F81&color=fff&name=${encodeURIComponent(user?.name || "User")}&size=128`;
+                    }}
+                  />
                   <div>
                     <p className="font-bold text-gray-800">{user?.name || "ইউজার"}</p>
                     <p className="text-xs text-gray-500">{user?.phoneNumber || ""}</p>
+                    <span className="text-xs bg-[var(--color-primary)] text-white px-2 py-0.5 rounded-full">
+                      🩸 {user?.bloodGroup || "N/A"}
+                    </span>
                   </div>
                 </div>
               ) : (
                 <h2 className="text-xl font-bold text-[var(--color-primary)]">মেনু</h2>
               )}
-              <button onClick={() => setOpen(false)} className="text-2xl text-gray-500">✕</button>
+              <button onClick={() => setOpen(false)} className="text-2xl text-gray-500 hover:text-gray-700">
+                ✕
+              </button>
             </div>
             
-            <div className="flex flex-col gap-4">
-              <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🏠 হোম</Link>
-              <Link href="/about" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">📖 আমাদের সম্পর্কে</Link>
-              <Link href="/donors" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🩸 রক্তদাতা</Link>
-              <Link href="/emergency-phone-number" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🚨 জরুরী ফোন নাম্বার</Link>
+            {/* মেনু আইটেম */}
+            <div className="flex flex-col gap-2">
+              <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                🏠 হোম
+              </Link>
+              <Link href="/about" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                📖 আমাদের সম্পর্কে
+              </Link>
+              <Link href="/donors" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                🩸 রক্তদাতা
+              </Link>
+              <Link href="/emergency-phone-number" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                🚨 জরুরী ফোন নাম্বার
+              </Link>
+              
               <hr className="my-2" />
+              
               {token ? (
                 <>
-                  <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">👤 প্রোফাইল</Link>
-                  <button onClick={() => { handleLogout(); setOpen(false); }} className="flex items-center gap-3 px-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition">🚪 লগআউট</button>
+                  <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                    👤 প্রোফাইল
+                  </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="flex items-center gap-3 px-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition text-left"
+                  >
+                    🚪 লগআউট
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link href="/register" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">📝 রেজিস্ট্রেশন</Link>
-                  <Link href="/login" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">🔑 লগইন</Link>
+                  <Link href="/register" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                    📝 রেজিস্ট্রেশন
+                  </Link>
+                  <Link href="/login" onClick={() => setOpen(false)} className="flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg transition">
+                    🔑 লগইন
+                  </Link>
                 </>
               )}
+            </div>
+            
+            {/* ফুটার */}
+            <div className="mt-6 pt-4 border-t text-xs text-gray-400 text-center">
+              <p>রক্তদান - জীবন বাঁচানোর সংগ্রাম</p>
+              <p className="mt-1">© {new Date().getFullYear()} সর্বস্বত্ব সংরক্ষিত</p>
             </div>
           </div>
         </div>

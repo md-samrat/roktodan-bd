@@ -1,43 +1,153 @@
-import prisma from "@/lib/prisma";
+// app/api/users/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import jwt from "jsonwebtoken";
 
-export async function DELETE(request: NextRequest) {
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-it";
+
+// ✅ GET: নির্দিষ্ট ইউজারের ডেটা
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    const { id } = await params;
 
-    if (!id) {
+    // ✅ Authorization header থেকে token নেওয়া
+    const authHeader = request.headers.get("authorization");
+    const token = authHeader?.split(" ")[1];
+
+    if (!token) {
       return NextResponse.json(
-        { error: "ইউজার আইডি প্রদান করুন" },
-        { status: 400 }
+        { error: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    // ইউজার আছে কিনা চেক করা
-    const existingUser = await prisma.user.findUnique({
+    // ✅ Token verify
+    try {
+      jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid token" },
+        { status: 401 }
+      );
+    }
+
+    // ✅ ইউজার খোঁজা
+    const user = await prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        phoneNumber: true,
+        bloodGroup: true,
+        address: true,
+        gender: true,
+        profileImage: true,
+        lastDonationDate: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
-    if (!existingUser) {
+    if (!user) {
       return NextResponse.json(
-        { error: "ইউজার পাওয়া যায়নি" },
+        { error: "User not found" },
         { status: 404 }
       );
     }
 
-    // ইউজার ডিলিট করা
-    await prisma.user.delete({
-      where: { id },
+    return NextResponse.json({
+      success: true,
+      user: user,
     });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch user" },
+      { status: 500 }
+    );
+  }
+}
+
+// ✅ PUT: ইউজার আপডেট
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const { name, phoneNumber, bloodGroup, address, gender, profileImage } = body;
+
+    // ✅ Authorization check
+    const authHeader = request.headers.get("authorization");
+    const token = authHeader?.split(" ")[1];
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // ✅ Token verify
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET) as any;
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid token" },
+        { status: 401 }
+      );
+    }
+
+    // ✅ ইউজার ম্যাচ চেক
+    if (decoded.id !== id) {
+      return NextResponse.json(
+        { error: "You can only update your own profile" },
+        { status: 403 }
+      );
+    }
+
+    // ✅ ইউজার আপডেট
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        name,
+        phoneNumber,
+        bloodGroup,
+        address,
+        gender,
+        profileImage,
+      },
+    });
+
+    // ✅ নতুন Token তৈরি
+    const newToken = jwt.sign(
+      {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        phoneNumber: updatedUser.phoneNumber,
+        bloodGroup: updatedUser.bloodGroup,
+      },
+      JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    const { password: _, ...userWithoutPassword } = updatedUser;
 
     return NextResponse.json({
       success: true,
-      message: "ইউজার ডিলিট করা হয়েছে",
+      message: "Profile updated successfully!",
+      user: userWithoutPassword,
+      token: newToken,
     });
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error updating user:", error);
     return NextResponse.json(
-      { error: "ইউজার ডিলিট করতে সমস্যা হয়েছে" },
+      { error: "Failed to update user" },
       { status: 500 }
     );
   }

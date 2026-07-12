@@ -12,13 +12,27 @@ export default function Hero() {
     const fetchDonors = async () => {
       try {
         const response = await fetch("/api/public-donors");
-        const data = await response.json();
         
-        if (Array.isArray(data)) {
+        if (!response.ok) {
+          throw new Error("Failed to fetch");
+        }
+        
+        const data = await response.json();
+        //console.log("API Response:", data); // ডিবাগিং
+        
+        // ✅ সঠিকভাবে ডেটা চেক করা
+        if (data.success && Array.isArray(data.donors)) {
+          setTotalDonors(data.donors.length);
+        } else if (Array.isArray(data)) {
+          // পুরোনো ফরম্যাটের জন্য (যদি সরাসরি অ্যারে আসে)
           setTotalDonors(data.length);
+        } else {
+          console.error("Unexpected data format:", data);
+          setTotalDonors(0);
         }
       } catch (error) {
         console.error("Error fetching donors:", error);
+        setTotalDonors(0);
       } finally {
         setLoading(false);
       }
@@ -108,7 +122,7 @@ export default function Hero() {
               </h2>
 
               <p className="mt-3 text-[var(--color-text-soft)] leading-7">
-                কুমিল্লায় প্রয়োজনীয় রক্তের গ্রুপ অনুযায়ী দ্রুত রক্তদাতা খুঁজে নিন।
+                পুরো বাংলাদেশ জুড়ে প্রয়োজনীয় রক্তের গ্রুপ অনুযায়ী দ্রুত রক্তদাতা খুঁজে নিন।
               </p>
 
               <Link href="/donors">
@@ -117,6 +131,24 @@ export default function Hero() {
                 </button>
               </Link>
 
+              {/* 🔄 রিফ্রেশ বাটন (ডিবাগিং এর জন্য) */}
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  fetch("/api/public-donors")
+                    .then(res => res.json())
+                    .then(data => {
+                      if (data.success && Array.isArray(data.donors)) {
+                        setTotalDonors(data.donors.length);
+                      }
+                    })
+                    .catch(console.error)
+                    .finally(() => setLoading(false));
+                }}
+                className="mt-3 text-xs text-gray-400 hover:text-gray-600 transition"
+              >
+                ↻ রিফ্রেশ
+              </button>
             </div>
           </div>
 
