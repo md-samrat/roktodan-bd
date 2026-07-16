@@ -31,11 +31,11 @@ export default function ProfilePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ ইউজার ডাটা লোড করা
+  
   const loadUserData = async () => {
     const token = localStorage.getItem("token");
     
-    //console.log("Token from localStorage:", token); // ডিবাগিং
+    //console.log("Token from localStorage:", token);
 
     if (!token) {
       //console.log("No token found, redirecting to login");
@@ -44,13 +44,13 @@ export default function ProfilePage() {
     }
 
     try {
-      // টোকেন থেকে id বের করা
+      
       const base64Payload = token.split(".")[1];
       const payload = JSON.parse(atob(base64Payload));
-      //console.log("Decoded token payload:", payload); // ডিবাগিং
+      //console.log("Decoded token payload:", payload);
       
       const userId = payload.id;
-      //console.log("User ID from token:", userId); // ডিবাগিং
+      //console.log("User ID from token:", userId); 
 
       if (!userId) {
         //console.log("No user ID in token, redirecting to login");
@@ -59,7 +59,7 @@ export default function ProfilePage() {
         return;
       }
 
-      // ✅ API থেকে ডেটা fetch
+      
       //console.log("Fetching user data from API...");
       const response = await fetch(`/api/users/${userId}`, {
         headers: {
@@ -67,7 +67,7 @@ export default function ProfilePage() {
         },
       });
 
-      //console.log("API response status:", response.status); // ডিবাগিং
+      //console.log("API response status:", response.status); 
 
       if (!response.ok) {
         if (response.status === 401 || response.status === 404) {
@@ -80,7 +80,7 @@ export default function ProfilePage() {
       }
 
       const data = await response.json();
-      //console.log("API response data:", data); // ডিবাগিং
+      //console.log("API response data:", data); 
       
       if (data.success && data.user) {
         setUserData(data.user);
@@ -197,7 +197,7 @@ export default function ProfilePage() {
     });
   };
 
-  // ✅ লোডিং স্টেট
+ 
   if (isLoading) {
     return (
       <section className="min-h-screen flex items-center justify-center">
@@ -209,7 +209,7 @@ export default function ProfilePage() {
     );
   }
 
-  // ✅ ইউজার ডেটা না থাকলে
+  
   if (!userData) {
     return (
       <section className="min-h-screen flex items-center justify-center">

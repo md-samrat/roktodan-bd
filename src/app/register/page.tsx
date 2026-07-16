@@ -29,7 +29,7 @@ export default function RegisterPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
 
-  // চেক করা ইউজার আগে থেকে লগইন আছে কিনা
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -79,13 +79,12 @@ export default function RegisterPage() {
     }
   };
 
-  // আগে থেকে লগইন থাকলে প্রোফাইলে রিডাইরেক্ট
   const handleGoToProfile = () => {
     setShowAlreadyLoggedInModal(false);
     router.push("/profile");
   };
 
-  // লগআউট করে নতুন রেজিস্ট্রেশন
+  
   const handleLogoutAndRegister = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -97,7 +96,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // আগে থেকে লগইন থাকলে মডাল দেখান
+  
     if (isLoggedIn) {
       setShowAlreadyLoggedInModal(true);
       return;
@@ -122,7 +121,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Prisma model অনুযায়ী ডেটা প্রস্তুত করা
+      
       const submitData = {
         name: formData.name,
         phoneNumber: formData.phoneNumber,
@@ -146,21 +145,21 @@ export default function RegisterPage() {
       // //console.log(data)
 
       if (!res.ok) {
-        // ডুপ্লিকেট ফোন নাম্বার এরর
+   
         if (res.status === 400 && 
             (data.message === "এই নাম্বার দিয়ে আগে থেকেই রেজিস্টার করা হয়েছে" ||
              data.message?.includes("phoneNumber") ||
              data.message?.includes("Phone number already exists"))) {
           setShowDuplicateModal(true);
         }
-        // পাসওয়ার্ড ভ্যালিডেশন এরর
+        
         else if (data.message?.includes("পাসওয়ার্ড") || 
                  data.message?.includes("password") ||
                  data.message?.includes("৬ অক্ষর")) {
           setErrorMessage("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে");
           setShowErrorModal(true);
         }
-        // অন্যান্য এরর
+      
         else {
           setErrorMessage(data.message || data.error || "রেজিস্ট্রেশন failed");
           setShowErrorModal(true);

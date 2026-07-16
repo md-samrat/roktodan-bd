@@ -21,37 +21,37 @@ import { MdLocalPolice, MdHealthAndSafety, MdGavel } from "react-icons/md";
 export default function EmergencyPhonePage() {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 🏛️ শুধুমাত্র সরকারি ও বিশ্বস্ত সূত্র থেকে সংগৃহীত তথ্য
+  //  শুধুমাত্র সরকারি ও বিশ্বস্ত সূত্র থেকে সংগৃহীত তথ্য
   const data = {
     hospitals: [
-      // 🏥 ঢাকা বিভাগের হাসপাতাল
+      //  ঢাকা বিভাগের হাসপাতাল
       { name: "ঢাকা মেডিকেল কলেজ হাসপাতাল", phone: "০২-৯৬৬৩৪২৯", area: "ঢাকা", division: "ঢাকা", type: "সরকারি", verified: true, source: "সরকারি" },
       { name: "বঙ্গবন্ধু শেখ মুজিব মেডিকেল বিশ্ববিদ্যালয় (BSMMU)", phone: "০২-৮৬১২৫৫০-৪", area: "ঢাকা", division: "ঢাকা", type: "সরকারি", verified: true, source: "সরকারি" },
       { name: "স্যার সলিমুল্লাহ মেডিকেল কলেজ হাসপাতাল", phone: "০২-৭৩১৯০০২-৫", area: "ঢাকা", division: "ঢাকা", type: "সরকারি", verified: true, source: "সরকারি" },
       { name: "ঢাকা শিশু হাসপাতাল", phone: "০২-৮১১৬০৬১-২", area: "ঢাকা", division: "ঢাকা", type: "সরকারি", verified: true, source: "সরকারি" },
       { name: "হলি ফ্যামিলি রেড ক্রিসেন্ট মেডিকেল কলেজ হাসপাতাল", phone: "০২-৮৩১১৭২১-৫", area: "ঢাকা", division: "ঢাকা", type: "বেসরকারি", verified: false, source: "সরকারি" },
       
-      // 🏥 চট্টগ্রাম বিভাগ
+      // চট্টগ্রাম বিভাগ
       { name: "চট্টগ্রাম মেডিকেল কলেজ হাসপাতাল", phone: "০৩১-৬১৯৫০০", area: "চট্টগ্রাম", division: "চট্টগ্রাম", type: "সরকারি", verified: true, source: "সরকারি" },
       
-      // 🏥 রাজশাহী বিভাগ
+      //  রাজশাহী বিভাগ
       { name: "রাজশাহী মেডিকেল কলেজ হাসপাতাল", phone: "০৭২১-৭৭৫০০০", area: "রাজশাহী", division: "রাজশাহী", type: "সরকারি", verified: true, source: "সরকারি" },
       
-      // 🏥 খুলনা বিভাগ
+      //  খুলনা বিভাগ
       { name: "খুলনা মেডিকেল কলেজ হাসপাতাল", phone: "০৪১-৭২১৫৩৩", area: "খুলনা", division: "খুলনা", type: "সরকারি", verified: true, source: "সরকারি" },
       
-      // 🏥 সিলেট বিভাগ
+      //  সিলেট বিভাগ
       { name: "সিলেট এমএজি ওসমানী মেডিকেল কলেজ", phone: "০৮২১-৭১৭০০০", area: "সিলেট", division: "সিলেট", type: "সরকারি", verified: true, source: "সরকারি" },
       
-      // 🏥 ময়মনসিংহ বিভাগ
+      // ময়মনসিংহ বিভাগ
       { name: "ময়মনসিংহ মেডিকেল কলেজ হাসপাতাল", phone: "০৯১-৬১৫০০", area: "ময়মনসিংহ", division: "ময়মনসিংহ", type: "সরকারি", verified: true, source: "সরকারি" },
       { name: "কমিউনিটি বেসড মেডিকেল কলেজ বাংলাদেশ", phone: "০১৭৪১-১১৫৫৬৯", area: "ময়মনসিংহ", division: "ময়মনসিংহ", type: "বেসরকারি", verified: false, source: "প্রতিষ্ঠান" },
       
-      // 🏥 ময়মনসিংহের অতিরিক্ত হাসপাতাল
+      //  ময়মনসিংহের অতিরিক্ত হাসপাতাল
       { name: "মনোন মেডিকেল কলেজ হাসপাতাল", phone: "০১৭৪৫৭৭৪৬১৭", area: "মানিকগঞ্জ", division: "ঢাকা", type: "বেসরকারি", verified: false, source: "প্রতিষ্ঠান" },
     ],
     emergency: [
-      // 🚨 জাতীয় জরুরি সেবা (সরকারি সূত্র থেকে সংগৃহীত) [citation:10][citation:1][citation:5]
+      //  জাতীয় জরুরি সেবা (সরকারি সূত্র থেকে সংগৃহীত) [citation:10][citation:1][citation:5]
       { name: "জাতীয় জরুরি সেবা", phone: "৯৯৯", area: "সারাদেশ", division: "সারাদেশ", type: "২৪/৭ হটলাইন", verified: true, source: "সরকারি" },
       { name: "ফায়ার সার্ভিস ও সিভিল ডিফেন্স", phone: "১০২", area: "সারাদেশ", division: "সারাদেশ", type: "২৪/৭ হটলাইন", verified: true, source: "সরকারি" },
       { name: "ফায়ার সার্ভিস (পুরোনো)", phone: "১৬১৬৩", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি", note: "সতর্কতা: ১৬১৬৩ নম্বরটি ২০২৪ সালের শেষে বন্ধ হয়ে যাচ্ছে। ১০২ ব্যবহার করুন।" },
@@ -61,19 +61,19 @@ export default function EmergencyPhonePage() {
       { name: "দুর্যোগের আগাম বার্তা", phone: "১০৯০", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       { name: "দুর্যোগ ব্যবস্থাপনা কন্ট্রোল রুম", phone: "০১৩১৮২৩৪৫৬০", area: "সারাদেশ", division: "সারাদেশ", type: "জরুরি", verified: true, source: "সরকারি" },
       
-      // 👮 পুলিশ সেবা [citation:10][citation:5][citation:1]
+      //  পুলিশ সেবা [citation:10][citation:5][citation:1]
       { name: "পুলিশ হেল্পলাইন", phone: "১০০", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       { name: "অনলাইন জিডি হেল্পলাইন", phone: "০১৩২০০০১৪২৮", area: "সারাদেশ", division: "সারাদেশ", type: "২৪/৭ হটলাইন", verified: true, source: "সরকারি" },
       
-      // 👶 শিশু ও নারী সুরক্ষা [citation:10][citation:5][citation:1]
+      //  শিশু ও নারী সুরক্ষা [citation:10][citation:5][citation:1]
       { name: "শিশু সহায়তা", phone: "১০৯৮", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       { name: "নারী ও শিশু নির্যাতন প্রতিরোধ", phone: "১০৯", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       
-      // ⚖️ দুর্নীতি ও আইন সেবা [citation:10][citation:5]
+      //  দুর্নীতি ও আইন সেবা [citation:10][citation:5]
       { name: "দুদক হটলাইন", phone: "১০৬", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       { name: "সরকারি আইন সেবা", phone: "১৬৪৩০", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       
-      // 🪪 অন্যান্য গুরুত্বপূর্ণ সেবা [citation:10][citation:5]
+      //  অন্যান্য গুরুত্বপূর্ণ সেবা [citation:10][citation:5]
       { name: "জাতীয় পরিচয়পত্র সেবা", phone: "১০৫", area: "সারাদেশ", division: "সারাদেশ", type: "হটলাইন", verified: true, source: "সরকারি" },
       { name: "আইইডিসিআর", phone: "১০৬৫৫", area: "সারাদেশ", division: "সারাদেশ", type: "স্বাস্থ্য হটলাইন", verified: true, source: "সরকারি" },
     ],

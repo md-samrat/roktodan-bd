@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, useCallback } from "react";
 
 interface Donor {
-  id: string; // ✅ _id না, id হবে
+  id: string; 
   name: string;
   phoneNumber: string;
   bloodGroup: string;
@@ -30,21 +30,19 @@ function DonorsContent() {
     }
   }, [searchParams]);
 
-  // ফেচ ফাংশন
+ 
   const fetchDonors = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch("/api/public-donors");
       
-      // ✅ রেসপন্স চেক করা
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      //console.log("API Response:", data); // ডিবাগ করার জন্য
       
-      // ✅ সঠিকভাবে ডেটা চেক করা
       if (data.success && Array.isArray(data.donors)) {
         setDonors(data.donors);
       } else {
@@ -63,7 +61,7 @@ function DonorsContent() {
     fetchDonors();
   }, [fetchDonors]);
 
-  // প্রোফাইল আপডেটের পর রিফ্রেশ
+  
   useEffect(() => {
     const handleProfileUpdate = () => {
       fetchDonors();
@@ -78,7 +76,7 @@ function DonorsContent() {
     };
   }, [fetchDonors]);
 
-  // ফিল্টার করা
+
   useEffect(() => {
     if (searchGroup) {
       const filtered = donors.filter(
@@ -163,7 +161,7 @@ function DonorsContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredDonors.map((donor) => (
               <div
-                key={donor.id} // ✅ id ব্যবহার করুন
+                key={donor.id} 
                 className="card hover:shadow-lg transition duration-300"
               >
                 <div className="flex items-center gap-4">
