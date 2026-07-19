@@ -4,14 +4,14 @@ import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 
-// ইংরেজি ফন্ট
+
 const lora = Lora({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-lora",
 });
 
-// বাংলা ফন্ট (সঠিক রেন্ডারিংয়ের জন্য)
+
 const hindSiliguri = Hind_Siliguri({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -44,7 +44,7 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1838519377820773"
           crossOrigin="anonymous"
         />
-        {/* ব্রাউজারের ভাষা সেটিংস নির্বিশেষে বাংলা কন্টেন্ট ঠিক রাখতে */}
+       
         <meta name="language" content="Bengali" />
         <meta httpEquiv="Content-Language" content="bn" />
       </head>

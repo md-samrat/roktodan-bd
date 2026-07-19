@@ -1,5 +1,4 @@
-// lib/prisma.ts
-import { PrismaClient } from '@prisma/client'  // ✅ সঠিক ইম্পোর্ট
+import { PrismaClient } from '@prisma/client'  
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined

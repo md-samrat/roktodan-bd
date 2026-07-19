@@ -1,17 +1,15 @@
-// app/api/users/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-it";
 
-// ✅ GET: নির্দিষ্ট ইউজারের ডেটা
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Promise type
+  { params }: { params: Promise<{ id: string }> } 
 ) {
   try {
-    // ✅ params কে await করতে হবে
     const { id } = await params;
     
     console.log("GET /api/users/[id] - ID:", id);
@@ -23,7 +21,7 @@ export async function GET(
       );
     }
 
-    // ✅ Authorization header থেকে token নেওয়া
+   
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
 
@@ -34,11 +32,11 @@ export async function GET(
       );
     }
 
-    // ✅ Token verify
+
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       
-      // ✅ ইউজার ম্যাচ চেক
+    
       if (decoded.id !== id) {
         return NextResponse.json(
           { error: "You can only access your own profile" },
@@ -53,7 +51,7 @@ export async function GET(
       );
     }
 
-    // ✅ ইউজার খোঁজা
+    
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -90,13 +88,13 @@ export async function GET(
   }
 }
 
-// ✅ PUT: ইউজার আপডেট
+
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // ✅ Promise type
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ✅ params কে await করতে হবে
+    
     const { id } = await params;
     
     console.log("PUT /api/users/[id] - ID:", id);
@@ -111,7 +109,7 @@ export async function PUT(
     const body = await request.json();
     const { name, phoneNumber, bloodGroup, address, gender, profileImage } = body;
 
-    // ✅ Authorization check
+    
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
 
@@ -122,7 +120,7 @@ export async function PUT(
       );
     }
 
-    // ✅ Token verify
+  
     let decoded;
     try {
       decoded = jwt.verify(token, JWT_SECRET) as any;
@@ -133,7 +131,7 @@ export async function PUT(
       );
     }
 
-    // ✅ ইউজার ম্যাচ চেক
+    
     if (decoded.id !== id) {
       return NextResponse.json(
         { error: "You can only update your own profile" },
@@ -141,7 +139,7 @@ export async function PUT(
       );
     }
 
-    // ✅ ইউজার আপডেট
+    
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
@@ -154,7 +152,7 @@ export async function PUT(
       },
     });
 
-    // ✅ নতুন Token তৈরি
+    
     const newToken = jwt.sign(
       {
         id: updatedUser.id,

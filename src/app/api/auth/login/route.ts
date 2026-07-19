@@ -1,4 +1,3 @@
-// app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
@@ -8,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    //console.log("Login API called with:", body);
+ 
 
     const { phoneNumber, password } = body;
 

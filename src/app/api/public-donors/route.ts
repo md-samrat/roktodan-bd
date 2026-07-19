@@ -1,4 +1,3 @@
-// app/api/public-donors/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -6,7 +5,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
-    // ✅ ডেটাবেস কানেকশন চেক
+
     const donors = await prisma.user.findMany({
       select: {
         id: true,
@@ -38,7 +37,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-// 📋 GET: স্পেসিফিক ডোনারের বিস্তারিত তথ্য (আইডি দিয়ে)
 export async function GET_DONOR_BY_ID(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
