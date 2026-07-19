@@ -38,6 +38,7 @@ export default function RootLayout({
       className={`${lora.variable} ${hindSiliguri.variable} h-full antialiased`}
     >
       <head>
+        {/* <script src="https://quge5.com/88/tag.min.js" data-zone="261358" async data-cfasync="false"></script> */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1838519377820773"

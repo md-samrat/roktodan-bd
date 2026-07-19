@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, useCallback } from "react";
 
 interface Donor {
-  id: string; // ✅ _id না, id হবে
+  id: string; 
   name: string;
   phoneNumber: string;
   bloodGroup: string;
